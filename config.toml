@@ -1,0 +1,19 @@
+secret = 100
+
+[bucket.bkt]
+url = "nyc3.digitaloceanspaces.com"
+name = "coleman"
+
+[bucket.bucket2]
+url = "nyc3.digitaloceanspaces.com"
+name = "coleman2"
+
+
+[[user]]
+name = "coleman"
+home = "/home/coleman"
+groups = ["wheel", "something"]
+ssh_public_key = "bkt://ssh-keys/coleman.pub"
+ssh_private_key = "somerepo://ssh-keys/coleman"
+
+
