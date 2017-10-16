@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"regexp"
 
 	minio "github.com/minio/minio-go"
 )
@@ -76,4 +77,30 @@ func NewBucketClient(url, accessKey, secretKey string) (*BucketClient, error) {
 	}
 	bc.conn = c
 	return &bc, nil
+}
+
+func ParseResolverPath(path string) (string, string) {
+	m := getParams("^(?P<resolver>.*)+[:]{1}[/]{2}(?P<path>.*)+", path)
+	resolver, parsedPath := m["resolver"], m["path"]
+	if resolver == "" && parsedPath == "" {
+		// not a protocol: return original path, and
+		// caller can treat empty resolver as a signal
+		// that it's a local path
+		return "", path
+	}
+	return resolver, parsedPath
+}
+
+func getParams(regEx, path string) map[string]string {
+
+	var compRegEx = regexp.MustCompile(regEx)
+	match := compRegEx.FindStringSubmatch(path)
+
+	m := make(map[string]string)
+	for i, name := range compRegEx.SubexpNames() {
+		if i > 0 && i <= len(match) {
+			m[name] = match[i]
+		}
+	}
+	return m
 }

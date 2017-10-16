@@ -1,0 +1,45 @@
+{
+    "variables": {
+        "do_api_token": "",
+        "region": "nyc3"
+    },
+    "builders": [
+        {
+            "type": "digitalocean",
+            "image": "centos-7-x64",
+            "snapshot_name": "hpt-test-{{ timestamp }}",
+            "region": "{{ user `region` }}",
+            "size": "512mb",
+            "ssh_username": "root",
+            "api_token": "{{ user `do_api_token` }}"
+        }
+    ],
+    "provisioners": [
+        {
+            "type": "shell",
+            "execute_command":"echo {{user `ssh_username`}} | {{ .Vars }} sudo -E -S sh '{{ .Path }}'",
+            "inline": [
+                "mkdir -p /home/tester"
+            ]
+        },
+        {
+            "type": "file",
+            "source": "hpt",
+            "destination": "/home/tester/hpt"
+        },
+        {
+            "type": "file",
+            "source": "testconfig.toml",
+            "destination": "/home/coleman/testconfig.toml"
+        },
+        
+        {
+            "type": "shell",
+            "execute_command": "echo {{user `ssh_username`}} | {{ .Vars }} sudo -E -S sh '{{ .Path }}'",
+            "inline":[
+                "mv /home/tester/hpt /usr/bin/hpt",
+                "/usr/bin/hpt /home/tester/testconfig.toml 2>&1"
+            ]
+        }
+    ]
+}
