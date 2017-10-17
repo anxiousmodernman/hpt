@@ -75,9 +75,9 @@ func run(paths ...string) error {
 	}
 
 	for _, u := range conf.Users {
-		us, err := ApplyUser(u)
+		_, err := ApplyUser(u, conf) // ugly
 		if err != nil {
-			log.Printf("ERROR: ApplyUser %s: %v", u.Name, us.Err)
+			log.Printf("ERROR: ApplyUser %s: %v", u.Name, err)
 			continue
 		}
 		fmt.Println("hpt: created user", u.Name)

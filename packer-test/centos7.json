@@ -1,7 +1,9 @@
 {
     "variables": {
         "do_api_token": "",
-        "region": "nyc3"
+        "region": "nyc3",
+        "access_key": "",
+        "secret_key": ""
     },
     "builders": [
         {
@@ -30,7 +32,7 @@
         {
             "type": "file",
             "source": "testconfig.toml",
-            "destination": "/home/coleman/testconfig.toml"
+            "destination": "/home/tester/testconfig.toml"
         },
         
         {
@@ -38,7 +40,8 @@
             "execute_command": "echo {{user `ssh_username`}} | {{ .Vars }} sudo -E -S sh '{{ .Path }}'",
             "inline":[
                 "mv /home/tester/hpt /usr/bin/hpt",
-                "/usr/bin/hpt /home/tester/testconfig.toml 2>&1"
+                "chmod +x /usr/bin/hpt",
+                "DO_ACCESS_KEY={{ user `access_key` }} DO_SECRET_ACCESS_KEY={{ user `secret_key` }} /usr/bin/hpt /home/tester/testconfig.toml"
             ]
         }
     ]

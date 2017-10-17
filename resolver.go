@@ -32,12 +32,14 @@ func BuildResolver(name string, conf Config) (Resolver, error) {
 	for k, v := range conf.Buckets {
 		if k == name {
 			// TODO extract secrets into executor config
+			// env vars will be different based on provider. What do we do?
 			bc, err := NewBucketClient(v.URL,
 				os.Getenv("DO_ACCESS_KEY"), os.Getenv("DO_SECRET_ACCESS_KEY"))
 			if err != nil {
 				return nil, err
 			}
-			return NewBucketResolver(name, bc), nil
+			// pass the bucket name here
+			return NewBucketResolver(v.Name, bc), nil
 		}
 	}
 	if !found {
@@ -53,15 +55,18 @@ type BucketClient struct {
 	conn *minio.Client
 }
 
+// NewBucketResolver ...
 func NewBucketResolver(bucket string, bc *BucketClient) *BucketResolver {
 	return &BucketResolver{bc, bucket}
 }
 
+// BucketResolver wraps our BucketClient as a resolver.
 type BucketResolver struct {
 	*BucketClient
 	bucket string
 }
 
+// Get implements Resolver for an S3-like bucket.
 func (br *BucketResolver) Get(path string) (io.Reader, error) {
 	opts := minio.GetObjectOptions{}
 	return br.conn.GetObject(br.bucket, path, opts)

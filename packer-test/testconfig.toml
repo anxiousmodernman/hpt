@@ -15,8 +15,6 @@ url = "https://github.com/foo/configs.git"
 name = "coleman"
 home = "/home/coleman"
 groups = ["wheel", "something"]
-ssh_public_key = "bucket1://ssh-keys/coleman.pub"
-ssh_private_key = "somerepo://ssh-keys/coleman"
-
+ssh_public_key = "bucket1://ssh-keys/hackbox.pub"
 
 

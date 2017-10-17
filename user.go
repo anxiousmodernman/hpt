@@ -1,9 +1,9 @@
 package main
 
 import (
-	"bytes"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
@@ -12,6 +12,7 @@ import (
 	"strconv"
 )
 
+// UserState ...
 type UserState struct {
 	Changed bool
 	Err     error
@@ -20,26 +21,25 @@ type UserState struct {
 }
 
 // ApplyUser ...
-func ApplyUser(u User) (*UserState, error) {
+func ApplyUser(u User, conf Config) (*UserState, error) {
 
-	output := bytes.NewBuffer([]byte(""))
-	_ = output
 	var us UserState
 	_, err := user.Lookup(u.Name)
 	if err != nil {
 		if _, ok := err.(user.UnknownUserError); ok {
+			// not an error
 			log.Printf("user %s does not exist", u.Name)
-			goto NOEXIST
+		} else {
+			return nil, err
 		}
-		return nil, err
 	}
 
-NOEXIST:
 	// make user
 	cmd := exec.Command("adduser", u.Name)
 	if err := cmd.Run(); err != nil {
 		return nil, err
 	}
+
 	// make home
 	us.Changed = true
 
@@ -77,12 +77,72 @@ NOEXIST:
 	}
 
 	// parse a path
-	// resolver, path
+	resolverName, path := ParseResolverPath(u.SSHPublicKey)
+	if resolverName == "" {
+		// path is local, but we don't care about that...yet
+	}
+	// look up resolver
+	resolver, err := BuildResolver(resolverName, conf)
+	if err != nil {
+		return nil, err
+	}
+	r, err := resolver.Get(path)
+	if err != nil {
+		return nil, err
+	}
+	if r == nil {
+		return nil, fmt.Errorf("path %s yielded no data", u.SSHPublicKey)
+	}
+	data, err := ioutil.ReadAll(r)
+	if err != nil {
+		return nil, fmt.Errorf("read error: %v", err)
+	}
+	// write the public key
+	err = ioutil.WriteFile(filepath.Join(u.Home, ".ssh", "id_rsa.pub"),
+		data, 0644)
+	if err != nil {
+		return nil, err
+	}
 
-	// get ssh public keys
+	// Append public key to authorized keys. Open with O_APPEND and all data
+	// goes to the end.
+	f, err := os.OpenFile(
+		filepath.Join(u.Home, ".ssh", "authorized_keys"),
+		os.O_APPEND|os.O_WRONLY|os.O_CREATE,
+		0644)
+	if err != nil {
+		return nil, fmt.Errorf("open authorized_keys: %v", err)
+	}
+	defer f.Close()
+	// append to
+	f.Write(data)
+
+	// TODO: private key
 	// pub 644
+	// authorized_keys 644
 	// priv 600
+	type chown struct {
+		path  string
+		perms int
+	}
 
+	toChown := []chown{
+		{filepath.Join(u.Home), 0755},
+		{filepath.Join(u.Home, ".ssh"), 0755},
+		{filepath.Join(u.Home, ".ssh", "id_rsa.pub"), 0644},
+		{filepath.Join(u.Home, ".ssh", "authorized_keys"), 0644},
+	}
+
+	for _, tc := range toChown {
+		if err := os.Chown(u.Home, int(uid), int(gid)); err != nil {
+			return nil, fmt.Errorf("chown %s: %v", tc.path, err)
+		}
+		if err := os.Chmod(tc.path, os.FileMode(tc.perms)); err != nil {
+			return nil, fmt.Errorf("chmod %s: %v", tc.path, err)
+		}
+	}
+
+	fmt.Println("created user", u.Name)
 	return &us, nil
 }
 
