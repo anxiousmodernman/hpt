@@ -13,11 +13,12 @@ type Config struct {
 }
 
 type Repo struct {
-	URL string
+	URL string `toml:"url"`
 }
 
 type Bucket struct {
-	URL, Name string
+	URL  string `toml:"url"`
+	Name string `toml:"name"`
 }
 
 // User ...
@@ -27,6 +28,7 @@ type User struct {
 	Groups        []string `toml:"groups"`
 	SSHPublicKey  string   `toml:"ssh_public_key"`
 	SSHPrivateKey string   `toml:"ssh_private_key"`
+	Shell         string   `toml:"shell"`
 }
 
 // NewConfig makes a config.
@@ -38,7 +40,6 @@ func NewConfig(path string) (Config, error) {
 	}
 	return c, nil
 }
-
 
 /*
 ansible:
