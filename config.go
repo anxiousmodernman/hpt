@@ -6,29 +6,23 @@ import (
 
 // Config ...
 type Config struct {
-	Secret  int               `toml:"secret"`
-	Users   []User            `toml:"user"`
-	Repos   map[string]Repo   `toml:"repo"`
-	Buckets map[string]Bucket `toml:"bucket"`
+	Secret   int               `toml:"secret"`
+	Groups   []Group           `toml:"group"`
+	Users    []User            `toml:"user"`
+	Repos    map[string]Repo   `toml:"repo"`
+	Buckets  map[string]Bucket `toml:"bucket"`
+	Services []Service         `toml:"service"`
 }
 
+// Repo ...
 type Repo struct {
 	URL string `toml:"url"`
 }
 
+// Bucket ...
 type Bucket struct {
 	URL  string `toml:"url"`
 	Name string `toml:"name"`
-}
-
-// User ...
-type User struct {
-	Name          string   `toml:"name"`
-	Home          string   `toml:"home"`
-	Groups        []string `toml:"groups"`
-	SSHPublicKey  string   `toml:"ssh_public_key"`
-	SSHPrivateKey string   `toml:"ssh_private_key"`
-	Shell         string   `toml:"shell"`
 }
 
 // NewConfig makes a config.

@@ -1,10 +1,9 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
-	"io"
 	"io/ioutil"
-	"log"
 	"os"
 	"os/exec"
 	"os/user"
@@ -12,77 +11,79 @@ import (
 	"strconv"
 )
 
-// UserState ...
-type UserState struct {
-	Changed bool
-	Err     error
-	Message string
-	Output  io.Reader
+// User ...
+type User struct {
+	Name          string   `toml:"name"`
+	Home          string   `toml:"home"`
+	Groups        []string `toml:"groups"`
+	SSHPublicKey  string   `toml:"ssh_public_key"`
+	SSHPrivateKey string   `toml:"ssh_private_key"`
+	Shell         string   `toml:"shell"`
+	Sudoers       bool     `toml:"sudoers"`
 }
 
 // ApplyUsers ...
 func ApplyUsers(conf Config) []*ApplyState {
 	var result []*ApplyState
 	for _, u := range conf.Users {
-		state, _ := ApplyUser(u, conf)
+		state := ApplyUser(u, conf)
 		result = append(result, state)
 	}
-	return result, nil
+	return result
 }
 
 // ApplyUser ...
-func ApplyUser(u User, conf Config) (*ApplyState, error) {
+func ApplyUser(u User, conf Config) *ApplyState {
 
 	var state ApplyState
-	_, err := user.Lookup(u.Name)
+	state.Output = bytes.NewBuffer([]byte(""))
+	exists, err := userExists(u.Name)
 	if err != nil {
-		if _, ok := err.(user.UnknownUserError); ok {
-			// not an error
-			log.Printf("user %s does not exist", u.Name)
-		} else {
-			return nil, err
-		}
+		return state.Error(err)
 	}
 
-	// make user
-	cmd := exec.Command("adduser", u.Name)
-	if err := cmd.Run(); err != nil {
-		return nil, err
+	if !exists {
+		// make user
+		cmd := exec.Command("adduser", u.Name)
+		out, err := cmd.CombinedOutput()
+		if err != nil {
+			state.Output = bytes.NewBuffer(out)
+			return state.Error(err)
+		}
+		state.Output = bytes.NewBuffer(out)
+		state.Outcome = Changed
 	}
 
 	// make home
-	state.State = Changed
 
-	exists, err := pathExists(u.Home)
+	pexists, err := pathExists(u.Home)
 	if err != nil {
-		return nil, err
+		return state.Error(err)
 	}
-	if !exists {
+	if !pexists {
 		if err := os.Mkdir(u.Home, 0755); err != nil {
-			return nil, fmt.Errorf("mkdir fail: %v", err)
+			state.Err = fmt.Errorf("mkdir fail: %v", err)
+			return state.Error(err)
 		}
 	}
 
 	_, uid, gid, err := lookupUser(u.Name)
 	if err != nil {
-		// could be UnknownUserError, but at this point
-		// that would indicate an unrecoverable error
-		return nil, err
+		return state.Error(err)
 	}
 
 	err = os.Chown(u.Home, int(uid), int(gid))
 	if err != nil {
-		return nil, fmt.Errorf("chown home: %v", err)
+		return state.Error(fmt.Errorf("chown home: %v", err))
 	}
-	// make ssh dir 700
 	sshDir := filepath.Join(u.Home, ".ssh")
 	exists, err = pathExists(sshDir)
 	if err != nil {
-		return nil, err
+		return state.Error(err)
 	}
 	if !exists {
 		if err := os.Mkdir(sshDir, 0755); err != nil {
-			return nil, fmt.Errorf("mkdir fail: %v", err)
+			return state.Error(fmt.Errorf("mkdir fail: %v", err))
 		}
 	}
 
@@ -94,24 +95,24 @@ func ApplyUser(u User, conf Config) (*ApplyState, error) {
 	// look up resolver
 	resolver, err := BuildResolver(resolverName, conf)
 	if err != nil {
-		return nil, err
+		return state.Error(err)
 	}
 	r, err := resolver.Get(path)
 	if err != nil {
-		return nil, err
+		return state.Error(err)
 	}
 	if r == nil {
-		return nil, fmt.Errorf("path %s yielded no data", u.SSHPublicKey)
+		return state.Error(fmt.Errorf("path %s yielded no data", u.SSHPublicKey))
 	}
 	data, err := ioutil.ReadAll(r)
 	if err != nil {
-		return nil, fmt.Errorf("read error: %v", err)
+		return state.Error(fmt.Errorf("read error: %v", err))
 	}
 	// write the public key
 	err = ioutil.WriteFile(filepath.Join(u.Home, ".ssh", "id_rsa.pub"),
 		data, 0644)
 	if err != nil {
-		return nil, err
+		return state.Error(err)
 	}
 
 	// Append public key to authorized keys. Open with O_APPEND and all data
@@ -121,7 +122,7 @@ func ApplyUser(u User, conf Config) (*ApplyState, error) {
 		os.O_APPEND|os.O_WRONLY|os.O_CREATE,
 		0644)
 	if err != nil {
-		return nil, fmt.Errorf("open authorized_keys: %v", err)
+		return state.Error(fmt.Errorf("open authorized_keys: %v", err))
 	}
 	defer f.Close()
 	// append to
@@ -145,15 +146,32 @@ func ApplyUser(u User, conf Config) (*ApplyState, error) {
 
 	for _, tc := range toChown {
 		if err := os.Chown(u.Home, int(uid), int(gid)); err != nil {
-			return nil, fmt.Errorf("chown %s: %v", tc.path, err)
+			return state.Error(fmt.Errorf("chown %s: %v", tc.path, err))
 		}
 		if err := os.Chmod(tc.path, os.FileMode(tc.perms)); err != nil {
-			return nil, fmt.Errorf("chmod %s: %v", tc.path, err)
+			return state.Error(fmt.Errorf("chmod %s: %v", tc.path, err))
 		}
 	}
 
 	fmt.Println("created user", u.Name)
-	return &state, nil
+
+	// add users to groups
+	// groups must exist
+
+	if len(u.Groups) > 0 {
+		for _, grp := range u.Groups {
+			cmd := exec.Command("usermod", "-aG", grp, u.Name)
+			out, err := cmd.CombinedOutput()
+
+			if err != nil {
+				return state.Error(fmt.Errorf("usermod: %v", err))
+			}
+			_ = out // TODO(cm): centralize output/logging
+			fmt.Println("added group", grp)
+		}
+	}
+
+	return &state
 }
 
 func pathExists(path string) (bool, error) {
@@ -182,4 +200,16 @@ func lookupUser(name string) (*user.User, int64, int64, error) {
 	}
 
 	return u, uid, gid, nil
+}
+
+func userExists(name string) (bool, error) {
+	_, err := user.Lookup(name)
+	if err != nil {
+		if _, ok := err.(user.UnknownUserError); ok {
+			// the user does not exist, swallow the error
+			return false, nil
+		}
+		return false, err
+	}
+	return true, nil
 }

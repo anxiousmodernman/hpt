@@ -18,3 +18,14 @@ groups = ["wheel", "something"]
 ssh_public_key = "bucket1://ssh-keys/hackbox.pub"
 
 
+[[group]]
+name = "something"
+gid = "1001"
+
+[[group]]
+name = "wheel"
+passwordless_sudo = true
+
+[[service]]
+name = "sshd"
+status = "restarted"

@@ -82,10 +82,10 @@ func run(paths ...string) error {
 		return err
 	}
 
-	printStates := func(as []*ApplyState) {
+	printStates := func(stage string, as []*ApplyState) {
 		for _, s := range as {
 			if s.Err != nil {
-				boldRed.Printf("apply error: %v\n", err)
+				boldRed.Printf("%s apply error: %v\n", stage, s.Err)
 				// We proceed, because we expect to read from our Output buffer.
 			}
 			output, err := ioutil.ReadAll(s.Output)
@@ -97,18 +97,19 @@ func run(paths ...string) error {
 		}
 	}
 	// ApplyGroups
+	states := ApplyGroups(conf)
+	printStates("groups", states)
 
 	// ApplyUsers
-	states, err := ApplyUsers(conf)
-	if err != nil {
-		return err
-	}
-	printStates(states)
+	states = ApplyUsers(conf)
+	printStates("users", states)
 
 	// ApplyFiles
-	// ApplyServices
 	// ApplyPackages
 	// ApplyGitClone
+	// ApplyServices
+	states = ApplyServices(conf)
+	printStates("services", states)
 	// ApplyExec
 
 	return nil
