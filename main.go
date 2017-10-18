@@ -4,9 +4,10 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"log"
+	"io/ioutil"
 	"os"
 
+	"github.com/fatih/color"
 	"github.com/urfave/cli"
 )
 
@@ -63,8 +64,15 @@ func main() {
 
 }
 
+var (
+	boldRed = color.New(color.FgRed).Add(color.Bold)
+	white   = color.New(color.FgWhite)
+)
+
 // run takes a sequence of paths to config files.
 func run(paths ...string) error {
+
+	// Resolve initial paths on the command line
 
 	// TODO support merging multiple configs. For now, take the first.
 	path := paths[0]
@@ -74,14 +82,34 @@ func run(paths ...string) error {
 		return err
 	}
 
-	for _, u := range conf.Users {
-		_, err := ApplyUser(u, conf) // ugly
-		if err != nil {
-			log.Printf("ERROR: ApplyUser %s: %v", u.Name, err)
-			continue
+	printStates := func(as []*ApplyState) {
+		for _, s := range as {
+			if s.Err != nil {
+				boldRed.Printf("apply error: %v\n", err)
+				// We proceed, because we expect to read from our Output buffer.
+			}
+			output, err := ioutil.ReadAll(s.Output)
+			if err != nil {
+				boldRed.Print("could not read output\n")
+				continue
+			}
+			white.Println(string(output))
 		}
-		fmt.Println("hpt: created user", u.Name)
 	}
+	// ApplyGroups
+
+	// ApplyUsers
+	states, err := ApplyUsers(conf)
+	if err != nil {
+		return err
+	}
+	printStates(states)
+
+	// ApplyFiles
+	// ApplyServices
+	// ApplyPackages
+	// ApplyGitClone
+	// ApplyExec
 
 	return nil
 }

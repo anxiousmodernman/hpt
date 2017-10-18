@@ -20,10 +20,20 @@ type UserState struct {
 	Output  io.Reader
 }
 
-// ApplyUser ...
-func ApplyUser(u User, conf Config) (*UserState, error) {
+// ApplyUsers ...
+func ApplyUsers(conf Config) []*ApplyState {
+	var result []*ApplyState
+	for _, u := range conf.Users {
+		state, _ := ApplyUser(u, conf)
+		result = append(result, state)
+	}
+	return result, nil
+}
 
-	var us UserState
+// ApplyUser ...
+func ApplyUser(u User, conf Config) (*ApplyState, error) {
+
+	var state ApplyState
 	_, err := user.Lookup(u.Name)
 	if err != nil {
 		if _, ok := err.(user.UnknownUserError); ok {
@@ -41,7 +51,7 @@ func ApplyUser(u User, conf Config) (*UserState, error) {
 	}
 
 	// make home
-	us.Changed = true
+	state.State = Changed
 
 	exists, err := pathExists(u.Home)
 	if err != nil {
@@ -143,7 +153,7 @@ func ApplyUser(u User, conf Config) (*UserState, error) {
 	}
 
 	fmt.Println("created user", u.Name)
-	return &us, nil
+	return &state, nil
 }
 
 func pathExists(path string) (bool, error) {
