@@ -8,11 +8,7 @@ here=$(pwd)
   cp hpt $here/hpt
 )
 
-PACKER_LOG=1 packer build \
-    -var "do_api_token=$DIGITALOCEAN_API_TOKEN" \
-    -var "access_key=$DO_ACCESS_KEY" \
-    -var "secret_key=$DO_SECRET_ACCESS_KEY" \
-    centos7.json
+PACKER_LOG=1 packer build centos7.json
 
 #delete images
 #imageid=$(doctl comput image list | awk '{if($2==}')

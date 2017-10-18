@@ -1,9 +1,9 @@
 {
     "variables": {
-        "do_api_token": "",
-        "region": "nyc3",
-        "access_key": "",
-        "secret_key": ""
+        "do_api_token": "{{ env `DIGITALOCEAN_API_TOKEN` }}",
+        "access_key": "{{ env `DO_ACCESS_KEY` }}",
+        "secret_key": "{{ env `DO_SECRET_ACCESS_KEY` }}",
+        "region": "nyc3"
     },
     "builders": [
         {
