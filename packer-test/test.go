@@ -27,6 +27,11 @@ var (
 
 // we're a script
 func main() {
+	then := time.Now()
+	defer func() {
+		now := time.Now()
+		fmt.Printf("test duration: %v seconds", now.Sub(then))
+	}()
 
 	runCommand := func(cmd string, args ...string) {
 		c := exec.Command(cmd, args...)
@@ -140,17 +145,21 @@ func main() {
 			log.Fatalf("get droplet status: %v", err)
 		}
 	}
+	// droplet is "ready" but we still need to give ssh some time.
+	fmt.Println("sleeping for sshd...")
+	time.Sleep(5 * time.Second)
 	addr, _ := vm.PublicIPv4()
 	ssh := &easyssh.MakeConfig{User: "coleman", Server: addr, Key: "/home/coleman/.ssh/hackbox"}
 
 	runSSH := func(cmd string) {
-		output, err = ssh.Run(cmd)
+		output, err := ssh.Run(cmd)
 		if err != nil {
 			log.Fatalf("%s over ssh: %v", cmd, err)
 		}
 		fmt.Printf("%s: %v", cmd, output)
 	}
 
+	fmt.Println("running some commands remotely...")
 	// Tests/Verifications over ssh
 	runSSH("groups")
 	runSSH("sudo systemctl status sshd")

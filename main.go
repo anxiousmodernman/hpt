@@ -106,6 +106,8 @@ func run(paths ...string) error {
 
 	// ApplyFiles
 	// ApplyPackages
+	states = ApplyPackages(conf)
+	printStates("packages", states)
 	// ApplyGitClone
 	// ApplyServices
 	states = ApplyServices(conf)

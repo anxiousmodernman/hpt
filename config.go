@@ -4,14 +4,16 @@ import (
 	"github.com/BurntSushi/toml"
 )
 
-// Config ...
+// Config is our container for passing any kind of applyable state.
 type Config struct {
-	Secret   int               `toml:"secret"`
-	Groups   []Group           `toml:"group"`
-	Users    []User            `toml:"user"`
-	Repos    map[string]Repo   `toml:"repo"`
-	Buckets  map[string]Bucket `toml:"bucket"`
-	Services []Service         `toml:"service"`
+	InstallPackages []string          `toml:"packages"`
+	Secret          int               `toml:"secret"`
+	Groups          []Group           `toml:"group"`
+	Users           []User            `toml:"user"`
+	Repos           map[string]Repo   `toml:"repo"`
+	Buckets         map[string]Bucket `toml:"bucket"`
+	Services        []Service         `toml:"service"`
+	Packages        []Package         `toml:"package"`
 }
 
 // Repo ...

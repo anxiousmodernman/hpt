@@ -1,4 +1,5 @@
-secret = 100
+
+packages = ["epel-release", "git"]
 
 [bucket.bucket1]
 url = "nyc3.digitaloceanspaces.com"
