@@ -30,7 +30,7 @@ func main() {
 	then := time.Now()
 	defer func() {
 		now := time.Now()
-		fmt.Printf("test duration: %v seconds", now.Sub(then))
+		fmt.Printf("test duration: %v seconds\n", now.Sub(then))
 	}()
 
 	runCommand := func(cmd string, args ...string) {
@@ -167,6 +167,7 @@ func main() {
 
 	if true {
 		// TODO don't do this
+		fmt.Println("server is: ", addr)
 		return
 	}
 

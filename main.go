@@ -3,7 +3,6 @@ package main
 import (
 	"errors"
 	"flag"
-	"fmt"
 	"io/ioutil"
 	"os"
 
@@ -37,10 +36,6 @@ func main() {
 			Name:  "plan",
 			Flags: []cli.Flag{confFlag},
 			Action: func(ctx *cli.Context) error {
-				args := ctx.Args()
-				fmt.Printf("first arg: %s", args.First())
-				fmt.Printf("remaining args: %v", args.Tail())
-
 				return nil
 			},
 		},
@@ -71,8 +66,6 @@ var (
 
 // run takes a sequence of paths to config files.
 func run(paths ...string) error {
-
-	// Resolve initial paths on the command line
 
 	// TODO support merging multiple configs. For now, take the first.
 	path := paths[0]
@@ -109,6 +102,8 @@ func run(paths ...string) error {
 	states = ApplyPackages(conf)
 	printStates("packages", states)
 	// ApplyGitClone
+	states = ApplyClones(conf)
+	printStates("clones", states)
 	// ApplyServices
 	states = ApplyServices(conf)
 	printStates("services", states)

@@ -1,13 +1,10 @@
 
-packages = ["epel-release", "git"]
+packages = ["epel-release", "git", "gcc", "libevent-devel", 
+            "automake", "ncurses-devel"]
 
 [bucket.bucket1]
 url = "nyc3.digitaloceanspaces.com"
 name = "coleman"
-
-[bucket.bucket2]
-url = "nyc3.digitaloceanspaces.com"
-name = "coleman2"
 
 [repo.somerepo]
 url = "https://github.com/foo/configs.git"
@@ -30,3 +27,8 @@ passwordless_sudo = true
 [[service]]
 name = "sshd"
 status = "restarted"
+
+[[clone]]
+URL = "https://github.com/tmux/tmux.git"
+dest = "/opt/tmux"
+user = "anxiousmodernman"

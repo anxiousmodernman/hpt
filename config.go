@@ -14,11 +14,16 @@ type Config struct {
 	Buckets         map[string]Bucket `toml:"bucket"`
 	Services        []Service         `toml:"service"`
 	Packages        []Package         `toml:"package"`
+	Clones          []Clone           `toml:"clone"`
 }
 
 // Repo ...
 type Repo struct {
-	URL string `toml:"url"`
+	URL      string `toml:"url"`
+	Dest     string `toml:"dest"`
+	User     string `toml:"user"`
+	Key      string `toml:"key"`
+	Password string `toml:"password"`
 }
 
 // Bucket ...
