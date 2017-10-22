@@ -9,20 +9,19 @@ name = "coleman"
 [repo.somerepo]
 url = "https://github.com/foo/configs.git"
 
+[[group]]
+name = "something"
+
+[[group]]
+name = "wheel"
+passwordless_sudo = true
+
 [[user]]
 name = "coleman"
 home = "/home/coleman"
 groups = ["wheel", "something"]
 ssh_public_key = "bucket1://ssh-keys/hackbox.pub"
 
-
-[[group]]
-name = "something"
-gid = "1001"
-
-[[group]]
-name = "wheel"
-passwordless_sudo = true
 
 [[service]]
 name = "sshd"
@@ -32,3 +31,8 @@ status = "restarted"
 URL = "https://github.com/tmux/tmux.git"
 dest = "/opt/tmux"
 user = "anxiousmodernman"
+
+
+# installing tmux
+# sh autoconf.sh
+# ./configure && make

@@ -37,6 +37,8 @@ func main() {
 		c := exec.Command(cmd, args...)
 		out, err := c.CombinedOutput()
 		if err != nil {
+			now := time.Now()
+			fmt.Printf("test duration: %v seconds\n", now.Sub(then))
 			log.Fatalf("exec %v %v: %v", cmd, args, err)
 		}
 		fmt.Println(string(out))

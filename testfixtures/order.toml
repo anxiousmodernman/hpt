@@ -1,0 +1,19 @@
+packages = ["one", "two", "three"]
+
+[[user]]
+name = "one"
+
+[[exec]]
+script = "echo two.sh"
+
+[[user]]
+name = "three"
+
+[[service]]
+name = "four"
+status = "restarted"
+
+[[clone]]
+URL = "https://github.com/five/five.git"
+dest = "/opt/five"
+user = "fiveoh"

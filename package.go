@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"log"
 	"os/exec"
 )
 
@@ -38,6 +39,23 @@ func ApplyPackages(conf Config) []*ApplyState {
 	}
 
 	return results
+}
+
+func ApplyInstallPackages(conf Config, packages []string) *ApplyState {
+	// HACK: we're doing "multiple" installs here. Really we want to flatten
+	// this packages = [ "foo", "baz", "zaz" ] syntax into the higher level
+	// config's Packages slice. Here we represent many states with one, and
+	// return early on any error. Sad!
+	var state *ApplyState
+	for _, pkg := range packages {
+		p := Package{pkg, Installed}
+		state = ApplyPackage(conf, p)
+		if state.Err != nil {
+			log.Println("execution error in packages stanza")
+			return state
+		}
+	}
+	return state
 }
 
 func ApplyPackage(conf Config, p Package) *ApplyState {

@@ -29,15 +29,6 @@ func ApplyClones(conf Config) []*ApplyState {
 func ApplyClone(conf Config, repo Clone) *ApplyState {
 	var state ApplyState
 	state.Output = bytes.NewBuffer([]byte("clone: " + repo.URL))
-	// c := githttp.DefaultClient
-	//	am, err := ssh.NewPublicKeysFromFile("anxiousmodernman", "/")
-	// opts := git.CloneOptions{
-	// 	URL:               repo.URL,
-	// 	SingleBranch:      true,
-	// 	RecurseSubmodules: git.DefaultSubmoduleRecursionDepth,
-	// 	Auth:              http.NewBasicAuth(repo.User, repo.Password),
-	// }
-	//
 	r, err := git.PlainClone(repo.Dest, false, &git.CloneOptions{
 		URL:               repo.URL,
 		RecurseSubmodules: git.DefaultSubmoduleRecursionDepth,
