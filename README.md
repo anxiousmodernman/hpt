@@ -2,32 +2,30 @@
 
 Really simple host provisioning.
 
+## Overview
 
-Goals:
+This project is aiming to be a simple and general provisioning tool for modern
+linux servers. Ultimately we want hpt to do the kinds of things that Ansible and
+SaltStack do, but with TOML config and the joy of Go.
 
-* add users
-* put files on hosts
-* install services
-* install packages
-* arbitrary execution
-* declarative configs 
-* really easy dsl
-* mergable configs for code reuse
+## Roadmap
 
-Non-goals:
+The hope is that by focusing on robust local execution first, we can design a 
+tool that feels similar whether it's being run locally or over a network.
 
-* launch servers (use terraform instead)
-* build images (use packer instead)
-
+* [x] local execution - run hpt during a packer build or straight up "on the box" 
+* [ ] remote execution - SSH? gRPC? It's TBD.
 
 ## Usage: on the host 
 
-Put `hpt` on the path and provide config(s)
+Put `hpt` on the PATH and provide config(s) as arguments.
 
 ```
 sudo hpt config.toml
 ```
 
-This is easy during packer builds.
+The config will be applied, and the results of the apply will be printed to the
+console. If no changes were required, none will be applied.
+
 
 
