@@ -25,9 +25,27 @@ type User struct {
 
 // ApplyUser ...
 func ApplyUser(u User, conf Config) *ApplyState {
-
-	var state ApplyState
+	var state *ApplyState
 	state.Output = bytes.NewBuffer([]byte(""))
+
+	exists, err := userExists(u.Name)
+	if err != nil {
+		return state.Error(err)
+	}
+	if !exists && u.Absent {
+		state.Outcome = Unchanged
+		state.Output.Write([]byte("nothing to do"))
+		return state
+	}
+
+	state = createUser(conf, u, state)
+
+	return state
+}
+
+func createUser(conf Config, u User, state *ApplyState) *ApplyState {
+	output := bytes.NewBuffer([]byte(""))
+	state.Output = output
 	exists, err := userExists(u.Name)
 	if err != nil {
 		return state.Error(err)
@@ -36,7 +54,7 @@ func ApplyUser(u User, conf Config) *ApplyState {
 	if !exists {
 		if u.Absent {
 			state.Outcome = Unchanged
-			return &state
+			return state
 		}
 		// make user
 		cmd := exec.Command("adduser", u.Name)
@@ -157,16 +175,15 @@ func ApplyUser(u User, conf Config) *ApplyState {
 		for _, grp := range u.Groups {
 			cmd := exec.Command("usermod", "-aG", grp, u.Name)
 			out, err := cmd.CombinedOutput()
-
 			if err != nil {
 				return state.Error(fmt.Errorf("usermod: %v", err))
 			}
-			_ = out // TODO(cm): centralize output/logging
+			output.Write(output)
 			fmt.Println("added group", grp)
 		}
 	}
 
-	return &state
+	return state
 }
 
 func pathExists(path string) (bool, error) {
