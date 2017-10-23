@@ -15,16 +15,6 @@ type Clone struct {
 	Password string `toml:"password"`
 }
 
-func ApplyClones(conf Config) []*ApplyState {
-
-	var results []*ApplyState
-	for _, c := range conf.Clones {
-		state := ApplyClone(conf, c)
-		results = append(results, state)
-	}
-	return results
-}
-
 // ApplyClone clones a repository to disk.
 func ApplyClone(conf Config, repo Clone) *ApplyState {
 	var state ApplyState
@@ -34,7 +24,6 @@ func ApplyClone(conf Config, repo Clone) *ApplyState {
 		RecurseSubmodules: git.DefaultSubmoduleRecursionDepth,
 	})
 
-	_ = r
 	exists, err := pathExists(repo.Dest)
 	if err != nil {
 		return state.Error(err)

@@ -16,6 +16,7 @@ import (
 	"github.com/anxiousmodernman/easyssh"
 	"github.com/digitalocean/godo"
 
+	sshlib "golang.org/x/crypto/ssh"
 	"golang.org/x/oauth2"
 )
 
@@ -151,7 +152,10 @@ func main() {
 	fmt.Println("sleeping for sshd...")
 	time.Sleep(5 * time.Second)
 	addr, _ := vm.PublicIPv4()
-	ssh := &easyssh.MakeConfig{User: "coleman", Server: addr, Key: "/home/coleman/.ssh/hackbox"}
+	ssh := &easyssh.MakeConfig{
+		User: "coleman", Server: addr, Key: "/home/coleman/.ssh/hackbox",
+		HostKeyCallback: sshlib.InsecureIgnoreHostKey(),
+	}
 
 	runSSH := func(cmd string) {
 		output, err := ssh.Run(cmd)

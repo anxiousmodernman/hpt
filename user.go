@@ -22,16 +22,6 @@ type User struct {
 	Sudoers       bool     `toml:"sudoers"`
 }
 
-// ApplyUsers ...
-func ApplyUsers(conf Config) []*ApplyState {
-	var result []*ApplyState
-	for _, u := range conf.Users {
-		state := ApplyUser(u, conf)
-		result = append(result, state)
-	}
-	return result
-}
-
 // ApplyUser ...
 func ApplyUser(u User, conf Config) *ApplyState {
 

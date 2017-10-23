@@ -41,7 +41,7 @@ type Bucket struct {
 // NewConfig makes a config.
 func NewConfig(path string) (Config, error) {
 	var c Config
-	_, err := toml.DecodeFile(path, &c)
+	md, err := toml.DecodeFile(path, &c)
 	if err != nil {
 		return c, err
 	}

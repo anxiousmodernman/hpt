@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"log"
 	"os/exec"
 )
 
@@ -20,27 +19,6 @@ type Package struct {
 	State PackageState
 }
 
-func ApplyPackages(conf Config) []*ApplyState {
-
-	if len(conf.InstallPackages) > 0 {
-		var ip []Package
-		for _, pkg := range conf.InstallPackages {
-			ip = append(ip, Package{Name: pkg, State: Installed})
-		}
-		// prefix packages with ip
-		conf.Packages = append(ip, conf.Packages...)
-	}
-
-	var results []*ApplyState
-
-	for _, pkg := range conf.Packages {
-		state := ApplyPackage(conf, pkg)
-		results = append(results, state)
-	}
-
-	return results
-}
-
 func ApplyInstallPackages(conf Config, packages []string) *ApplyState {
 	// HACK: we're doing "multiple" installs here. Really we want to flatten
 	// this packages = [ "foo", "baz", "zaz" ] syntax into the higher level
@@ -51,8 +29,8 @@ func ApplyInstallPackages(conf Config, packages []string) *ApplyState {
 		p := Package{pkg, Installed}
 		state = ApplyPackage(conf, p)
 		if state.Err != nil {
-			log.Println("execution error in packages stanza")
-			return state
+			return state.Error(
+				fmt.Errorf("error installing %s: %v", pkg, state.Err))
 		}
 	}
 	return state
@@ -67,7 +45,6 @@ func ApplyPackage(conf Config, p Package) *ApplyState {
 
 	switch p.State {
 	case Installed:
-		// do install
 		return state.Error(redhatInstall(p.Name, output))
 	}
 
