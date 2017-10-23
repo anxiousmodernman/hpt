@@ -17,3 +17,10 @@ ssh_public_key = "bkt://ssh-keys/coleman.pub"
 ssh_private_key = "somerepo://ssh-keys/coleman"
 
 
+[[user]]
+name = "coleman"
+home = "/home/coleman"
+groups = ["wheel", "something"]
+ssh_public_key = "bkt://ssh-keys/coleman.pub"
+ssh_private_key = "somerepo://ssh-keys/coleman"
+

@@ -3,7 +3,6 @@ package main
 import (
 	"errors"
 	"flag"
-	"fmt"
 	"io/ioutil"
 	"os"
 
@@ -17,8 +16,6 @@ var Version = "0.0.1"
 var (
 	confPath = flag.String("conf", "", "path to config file")
 )
-
-type Path string
 
 // automation for small infrastructures
 func main() {
@@ -37,10 +34,6 @@ func main() {
 			Name:  "plan",
 			Flags: []cli.Flag{confFlag},
 			Action: func(ctx *cli.Context) error {
-				args := ctx.Args()
-				fmt.Printf("first arg: %s", args.First())
-				fmt.Printf("remaining args: %v", args.Tail())
-
 				return nil
 			},
 		},
@@ -49,19 +42,15 @@ func main() {
 	// default action
 	app.Action = func(ctx *cli.Context) error {
 		args := ctx.Args()
-
 		if !args.Present() {
 			return errors.New("you must provide a config file")
 		}
-
 		var paths = []string{args.First()}
 		paths = append(paths, args.Tail()...)
-
 		return run(paths...)
 	}
 
 	app.Run(os.Args)
-
 }
 
 var (
@@ -72,21 +61,13 @@ var (
 // run takes a sequence of paths to config files.
 func run(paths ...string) error {
 
-	// Resolve initial paths on the command line
-
-	// TODO support merging multiple configs. For now, take the first.
+	// TODO support multiple configs
 	path := paths[0]
 
-	conf, err := NewConfig(path)
-	if err != nil {
-		return err
-	}
-
-	printStates := func(as []*ApplyState) {
+	printStates := func(stage string, as []*ApplyState) {
 		for _, s := range as {
 			if s.Err != nil {
-				boldRed.Printf("apply error: %v\n", err)
-				// We proceed, because we expect to read from our Output buffer.
+				boldRed.Printf("%s apply error: %v\n", stage, s.Err)
 			}
 			output, err := ioutil.ReadAll(s.Output)
 			if err != nil {
@@ -96,20 +77,24 @@ func run(paths ...string) error {
 			white.Println(string(output))
 		}
 	}
-	// ApplyGroups
-
-	// ApplyUsers
-	states, err := ApplyUsers(conf)
+	conf, err := NewConfig(path)
 	if err != nil {
 		return err
 	}
-	printStates(states)
-
-	// ApplyFiles
-	// ApplyServices
-	// ApplyPackages
-	// ApplyGitClone
-	// ApplyExec
+	ep, err := NewExecutionPlan(conf)
+	if err != nil {
+		return err
+	}
+	var as []*ApplyState
+	for {
+		fn := ep.Next()
+		if fn == nil {
+			break
+		}
+		state := fn()
+		as = append(as, state)
+	}
+	printStates("everything:", as)
 
 	return nil
 }

@@ -1,15 +1,20 @@
-secret = 100
+
+packages = ["epel-release", "git", "gcc", "libevent-devel", 
+            "automake", "ncurses-devel"]
 
 [bucket.bucket1]
 url = "nyc3.digitaloceanspaces.com"
 name = "coleman"
 
-[bucket.bucket2]
-url = "nyc3.digitaloceanspaces.com"
-name = "coleman2"
-
 [repo.somerepo]
 url = "https://github.com/foo/configs.git"
+
+[[group]]
+name = "something"
+
+[[group]]
+name = "wheel"
+passwordless_sudo = true
 
 [[user]]
 name = "coleman"
@@ -18,3 +23,16 @@ groups = ["wheel", "something"]
 ssh_public_key = "bucket1://ssh-keys/hackbox.pub"
 
 
+[[service]]
+name = "sshd"
+status = "restarted"
+
+[[clone]]
+URL = "https://github.com/tmux/tmux.git"
+dest = "/opt/tmux"
+user = "anxiousmodernman"
+
+
+# installing tmux
+# sh autoconf.sh
+# ./configure && make
