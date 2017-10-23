@@ -23,22 +23,44 @@ type User struct {
 	Absent        bool     `toml:"absent"`
 }
 
-// ApplyUser ...
+// ApplyUser is our top-level function for managing users. It corresponds to
+// the [[user]] block in our TOML configs.
 func ApplyUser(u User, conf Config) *ApplyState {
 	var state *ApplyState
 	state.Output = bytes.NewBuffer([]byte(""))
 
+	if u.Absent {
+		// delete the user if absent = true
+		state = deleteUser(conf, u, state)
+	}
+
+	state = createUser(conf, u, state)
+
+	return state
+}
+
+func deleteUser(conf Config, u User, state *ApplyState) *ApplyState {
+	if !u.Absent {
+		panic("deleteUser should not be called if Absent is false")
+	}
 	exists, err := userExists(u.Name)
 	if err != nil {
 		return state.Error(err)
 	}
-	if !exists && u.Absent {
-		state.Outcome = Unchanged
-		state.Output.Write([]byte("nothing to do"))
-		return state
+	if !exists {
+		_, err := state.Output.WriteString(u.Name + " does not exist, so nothing to do")
+		if err != nil {
+			return state.Error(err)
+		}
 	}
-
-	state = createUser(conf, u, state)
+	out, err := ExecCommand("userdel", u.Name)
+	if err != nil {
+		return state.Error(err)
+	}
+	_, err = state.Output.Write(out)
+	if err != nil {
+		return state.Error(err)
+	}
 
 	return state
 }
@@ -178,7 +200,10 @@ func createUser(conf Config, u User, state *ApplyState) *ApplyState {
 			if err != nil {
 				return state.Error(fmt.Errorf("usermod: %v", err))
 			}
-			output.Write(output)
+			_, err = output.Write(out)
+			if err != nil {
+				return state.Error(fmt.Errorf("could not write to buffer: %v", err))
+			}
 			fmt.Println("added group", grp)
 		}
 	}
