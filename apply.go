@@ -1,6 +1,6 @@
 package main
 
-import "io"
+import "bytes"
 
 // State represents the ultimate state of an apply call.
 type State int
@@ -13,7 +13,7 @@ const (
 
 // ApplyState is the return type of all our applies.
 type ApplyState struct {
-	Output  io.Reader
+	Output  *bytes.Buffer
 	Err     error
 	Outcome State
 }
