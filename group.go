@@ -17,17 +17,6 @@ type Group struct {
 	PasswordlessSudo bool   `toml:"passwordless_sudo"`
 }
 
-// ApplyGroups ...
-func ApplyGroups(conf Config) []*ApplyState {
-	var result []*ApplyState
-	for _, g := range conf.Groups {
-		state := ApplyGroup(g, conf)
-		result = append(result, state)
-	}
-
-	return result
-}
-
 // ApplyGroup ...
 func ApplyGroup(g Group, conf Config) *ApplyState {
 
