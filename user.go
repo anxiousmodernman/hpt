@@ -20,6 +20,7 @@ type User struct {
 	SSHPrivateKey string   `toml:"ssh_private_key"`
 	Shell         string   `toml:"shell"`
 	Sudoers       bool     `toml:"sudoers"`
+	Absent        bool     `toml:"absent"`
 }
 
 // ApplyUser ...
@@ -33,6 +34,10 @@ func ApplyUser(u User, conf Config) *ApplyState {
 	}
 
 	if !exists {
+		if u.Absent {
+			state.Outcome = Unchanged
+			return &state
+		}
 		// make user
 		cmd := exec.Command("adduser", u.Name)
 		out, err := cmd.CombinedOutput()
