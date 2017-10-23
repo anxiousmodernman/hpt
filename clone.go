@@ -19,7 +19,7 @@ type Clone struct {
 func ApplyClone(conf Config, repo Clone) *ApplyState {
 	var state ApplyState
 	state.Output = bytes.NewBuffer([]byte("clone: " + repo.URL))
-	r, err := git.PlainClone(repo.Dest, false, &git.CloneOptions{
+	_, err := git.PlainClone(repo.Dest, false, &git.CloneOptions{
 		URL:               repo.URL,
 		RecurseSubmodules: git.DefaultSubmoduleRecursionDepth,
 	})
