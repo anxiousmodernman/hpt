@@ -32,6 +32,10 @@ URL = "https://github.com/tmux/tmux.git"
 dest = "/opt/tmux"
 user = "anxiousmodernman"
 
+[[file]]
+path = "/opt/foo"
+dir = true
+
 
 # installing tmux
 # sh autoconf.sh

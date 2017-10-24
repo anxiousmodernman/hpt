@@ -78,9 +78,7 @@ func createUser(conf Config, u User, state *ApplyState) *ApplyState {
 			state.Outcome = Unchanged
 			return state
 		}
-		// make user
-		cmd := exec.Command("adduser", u.Name)
-		out, err := cmd.CombinedOutput()
+		out, err := ExecCommand("adduser", u.Name)
 		if err != nil {
 			state.Output = bytes.NewBuffer(out)
 			return state.Error(err)
@@ -90,7 +88,6 @@ func createUser(conf Config, u User, state *ApplyState) *ApplyState {
 	}
 
 	// make home
-
 	pexists, err := pathExists(u.Home)
 	if err != nil {
 		return state.Error(err)
@@ -125,7 +122,7 @@ func createUser(conf Config, u User, state *ApplyState) *ApplyState {
 	// parse a path
 	resolverName, path := ParseResolverPath(u.SSHPublicKey)
 	if resolverName == "" {
-		// path is local, but we don't care about that...yet
+		panic("local resolver unsupported")
 	}
 	// look up resolver
 	resolver, err := BuildResolver(resolverName, conf)

@@ -19,6 +19,7 @@ type Config struct {
 	Services        []Service         `toml:"service"`
 	Packages        []Package         `toml:"package"`
 	Clones          []Clone           `toml:"clone"`
+	Files           []File            `toml:"file"`
 	// keys is embedded at runtime after decoding the toml file
 	keys []toml.Key
 }
@@ -95,6 +96,11 @@ func (ep *ExecutionPlan) Next() func() *ApplyState {
 			p := ep.config.InstallPackages
 			return ApplyInstallPackages(ep.config, p)
 		}
+	case "file":
+		return func() *ApplyState {
+			f := ep.config.Files[p.I]
+			return ApplyFile(ep.config, f)
+		}
 	default:
 		log.Println("unknown execution type", p.T)
 		return nil
@@ -164,4 +170,5 @@ var validStates = []string{
 	"group",
 	"package",
 	"packages",
+	"file",
 }
