@@ -26,7 +26,7 @@ type User struct {
 // ApplyUser is our top-level function for managing users. It corresponds to
 // the [[user]] block in our TOML configs.
 func ApplyUser(u User, conf Config) *ApplyState {
-	var state *ApplyState
+	state := &ApplyState{}
 	state.Output = bytes.NewBuffer([]byte(""))
 
 	if u.Absent {

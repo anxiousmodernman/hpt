@@ -7,3 +7,4 @@ for image_id in $images
     doctl compute image delete $image_id --force
 end
 
+

@@ -18,6 +18,7 @@ type Clone struct {
 // ApplyClone clones a repository to disk.
 func ApplyClone(conf Config, repo Clone) *ApplyState {
 	var state ApplyState
+	fmt.Println("cloning", repo)
 	state.Output = bytes.NewBuffer([]byte("clone: " + repo.URL))
 	_, err := git.PlainClone(repo.Dest, false, &git.CloneOptions{
 		URL:               repo.URL,

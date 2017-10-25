@@ -23,7 +23,7 @@ type File struct {
 
 // ApplyFile ...
 func ApplyFile(conf Config, f File) *ApplyState {
-	var state *ApplyState
+	state := &ApplyState{}
 	state.Output = bytes.NewBuffer([]byte("file apply:"))
 
 	// prerequisites

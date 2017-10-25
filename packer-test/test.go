@@ -4,6 +4,7 @@ package main
 import (
 	"bufio"
 	"context"
+	"flag"
 	"fmt"
 	"io"
 	"log"
@@ -26,8 +27,14 @@ var (
 	verbose = true
 )
 
+// cli flags
+var (
+	keep = flag.Bool("keep", false, "whether to keep the vm online after the test is over")
+)
+
 // we're a script
 func main() {
+	flag.Parse()
 	then := time.Now()
 	defer func() {
 		now := time.Now()
@@ -157,7 +164,7 @@ func main() {
 		HostKeyCallback: sshlib.InsecureIgnoreHostKey(),
 	}
 
-	runSSH := func(cmd string) {
+	_ = func(cmd string) {
 		output, err := ssh.Run(cmd)
 		if err != nil {
 			log.Fatalf("%s over ssh: %v", cmd, err)
@@ -165,13 +172,7 @@ func main() {
 		fmt.Printf("%s: %v", cmd, output)
 	}
 
-	fmt.Println("running some commands remotely...")
-	// Tests/Verifications over ssh
-	runSSH("groups")
-	runSSH("sudo systemctl status sshd")
-	fmt.Println("sudo commands successful!")
-
-	if true {
+	if *keep {
 		// TODO don't do this
 		fmt.Println("server is: ", addr)
 		return
