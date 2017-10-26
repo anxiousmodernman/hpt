@@ -21,6 +21,11 @@ func TestResolverParser(t *testing.T) {
 			"",
 			"foo/baz",
 		},
+		{
+			"bkt://ssh-keys-/hackbox",
+			"bkt",
+			"ssh-keys-/hackbox",
+		},
 	}
 
 	for _, tc := range cases {

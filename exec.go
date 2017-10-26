@@ -2,13 +2,17 @@ package main
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"os/user"
 	"path/filepath"
+	"strconv"
 	"strings"
+	"syscall"
 )
 
 // Exec maps a shelled-out command.
@@ -16,20 +20,23 @@ type Exec struct {
 	Cmd    string   `toml:"cmd"`
 	Args   []string `toml:"args"`
 	Script string   `toml:"script"`
+	// TODO passing env vars, running as a user
+	Env  map[string]string `toml:"env"`
+	User string            `toml:"user"`
+	PWD  string            `toml:"pwd"`
 }
 
 // ApplyExec ...
 func ApplyExec(conf Config, e Exec) *ApplyState {
 	var state ApplyState
 
-	_ = ExecScriptTokens(e.Script)
 	if e.Script != "" {
 		state.Output = bytes.NewBufferString("script output:")
 		// NOTE: shelling out to a multi-line script is tricky. We want to
 		// pass each line in a script block to /bin/bash -c "line arg arg2", but
 		// we first need to test that the command is not a shell builtin or
 		// an alias.
-		out, err := execTempFile(e.Script)
+		out, err := execTempFile(e.Script, e.User, e.PWD)
 		if err != nil {
 			return state.Errorf("execTempFile error: %v", err)
 
@@ -42,11 +49,12 @@ func ApplyExec(conf Config, e Exec) *ApplyState {
 	return &state
 }
 
-func execTempFile(script string) ([]byte, error) {
+func execTempFile(script, as, pwd string) ([]byte, error) {
 	f, err := ioutil.TempFile("", "hpt-script")
 	if err != nil {
 		return nil, err
 	}
+	defer func() { os.Remove(f.Name()) }()
 	_, err = io.Copy(f, bytes.NewBufferString(script))
 	if err != nil {
 		return nil, err
@@ -62,7 +70,38 @@ func execTempFile(script string) ([]byte, error) {
 
 	}
 	fmt.Println("executing temp script:", fqp)
+
 	c := exec.Command("/bin/sh", fqp)
+	if as != "" {
+		u, err := user.Lookup(as)
+		if err != nil {
+			if _, ok := err.(user.UnknownUserError); ok {
+				return nil, errors.New("user does not exist")
+			}
+			return nil, err
+		}
+		uid, err := strconv.ParseUint(u.Uid, 10, 32)
+		if err != nil {
+			return nil, err
+		}
+		gid, err := strconv.ParseUint(u.Gid, 10, 32)
+		if err != nil {
+			return nil, err
+		}
+		// we've been given a user to run as
+		c.SysProcAttr = &syscall.SysProcAttr{
+			Credential: &syscall.Credential{
+				Uid: uint32(uid),
+				Gid: uint32(gid),
+			},
+			Setsid: true,
+		}
+	}
+
+	if pwd != "" {
+		c.Dir = pwd
+	}
+
 	return c.Output()
 }
 
