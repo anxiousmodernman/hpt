@@ -27,6 +27,19 @@ var (
 	verbose = true
 )
 
+var then time.Time
+
+func runCommand(cmd string, args ...string) {
+	c := exec.Command(cmd, args...)
+	out, err := c.CombinedOutput()
+	if err != nil {
+		now := time.Now()
+		fmt.Printf("test duration: %v seconds\n", now.Sub(then))
+		log.Fatalf("exec %v %v: %v", cmd, args, err)
+	}
+	fmt.Println(string(out))
+}
+
 // cli flags
 var (
 	keep = flag.Bool("keep", false, "whether to keep the vm online after the test is over")
@@ -35,22 +48,11 @@ var (
 // we're a script
 func main() {
 	flag.Parse()
-	then := time.Now()
+	then = time.Now()
 	defer func() {
 		now := time.Now()
 		fmt.Printf("test duration: %v seconds\n", now.Sub(then))
 	}()
-
-	runCommand := func(cmd string, args ...string) {
-		c := exec.Command(cmd, args...)
-		out, err := c.CombinedOutput()
-		if err != nil {
-			now := time.Now()
-			fmt.Printf("test duration: %v seconds\n", now.Sub(then))
-			log.Fatalf("exec %v %v: %v", cmd, args, err)
-		}
-		fmt.Println(string(out))
-	}
 
 	pwd, _ := os.Getwd()
 	cd := func() { os.Chdir(pwd) }
@@ -75,28 +77,6 @@ func main() {
 		log.Fatalf("cmd start: %v", err)
 	}
 
-	valueFromStream := func(re string, r io.ReadCloser) chan string {
-		var id string
-		reg, scnr, done := regexp.MustCompile(re), bufio.NewScanner(r), make(chan string)
-		go func() {
-			for scnr.Scan() {
-				line := scnr.Text()
-				fmt.Println(line)
-				if match := reg.FindStringSubmatch(line); match != nil {
-					paramsMap := make(map[string]string)
-					for i, name := range reg.SubexpNames() {
-						if i > 0 && i <= len(match) {
-							paramsMap[name] = match[i]
-						}
-					}
-					id = paramsMap["id"]
-				}
-			}
-			done <- id
-		}()
-		return done
-	}
-
 	var re = `.*digitalocean.*ID: (?P<id>\d+)\).*`
 	c1 := valueFromStream(re, stdout)
 
@@ -115,7 +95,6 @@ func main() {
 	tkn := token(os.Getenv("DIGITALOCEAN_API_TOKEN"))
 
 	// Now it's DO API time.
-
 	oauthClient := oauth2.NewClient(oauth2.NoContext, &tkn)
 	client := godo.NewClient(oauthClient)
 	ctx := context.TODO()
@@ -197,4 +176,26 @@ type token string
 func (t *token) Token() (*oauth2.Token, error) {
 	o2t := &oauth2.Token{AccessToken: string(*t)}
 	return o2t, nil
+}
+
+func valueFromStream(re string, r io.ReadCloser) chan string {
+	var id string
+	reg, scnr, done := regexp.MustCompile(re), bufio.NewScanner(r), make(chan string)
+	go func() {
+		for scnr.Scan() {
+			line := scnr.Text()
+			fmt.Println(line)
+			if match := reg.FindStringSubmatch(line); match != nil {
+				paramsMap := make(map[string]string)
+				for i, name := range reg.SubexpNames() {
+					if i > 0 && i <= len(match) {
+						paramsMap[name] = match[i]
+					}
+				}
+				id = paramsMap["id"]
+			}
+		}
+		done <- id
+	}()
+	return done
 }
