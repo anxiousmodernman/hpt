@@ -1,0 +1,34 @@
+{
+    "variables": {
+        "do_api_token": "{{ env `DIGITALOCEAN_API_TOKEN` }}",
+        "access_key": "{{ env `DO_ACCESS_KEY` }}",
+        "secret_key": "{{ env `DO_SECRET_ACCESS_KEY` }}",
+        "hpt_config": "hpt-dev.toml",
+        "region": "nyc3"
+    },
+    "builders": [
+        {
+            "type": "digitalocean",
+            "image": "28836419",
+            "snapshot_name": "hpt-dev-{{ timestamp }}",
+            "region": "{{ user `region` }}",
+            "size": "512mb",
+            "ssh_username": "root",
+            "api_token": "{{ user `do_api_token` }}"
+        }
+    ],
+    "provisioners": [
+        {
+            "type": "file",
+            "source": "{{user `hpt_config`}}",
+            "destination": "/home/tester/{{user `hpt_config`}}"
+        },
+        {
+            "type": "shell",
+            "execute_command": "echo {{user `ssh_username`}} | {{ .Vars }} sudo -E -S sh '{{ .Path }}'",
+            "inline":[
+                "DO_ACCESS_KEY={{ user `access_key` }} DO_SECRET_ACCESS_KEY={{ user `secret_key` }} /usr/bin/hpt /home/tester/{{user `hpt_config`}}"
+            ]
+        }
+    ]
+}

@@ -1,0 +1,20 @@
+
+[bucket.bkt]
+url = "nyc3.digitaloceanspaces.com"
+name = "coleman"
+
+[[file]]
+path = "/home/coleman/.ssh/hackbox"
+src = "bkt://ssh-keys/hackbox"
+perms = 600
+owner = "coleman"
+group = "coleman"
+
+# we assume that coleman is a user on the box and go is installed
+[[exec]]
+script = '''
+/usr/local/go/bin/go get -u github.com/golang/dep/cmd/dep
+ls /home/coleman/go/github.com
+'''
+user = "coleman"
+
