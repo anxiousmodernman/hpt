@@ -8,10 +8,10 @@
   version = "v0.3.0"
 
 [[projects]]
+  branch = "master"
   name = "github.com/anxiousmodernman/easyssh"
   packages = ["."]
-  revision = "0843403b8f601e8fd5389b3d3bf2b5d3c6714628"
-  version = "0.1"
+  revision = "29882595f380aec66d4e16b2efbef85fa956de59"
 
 [[projects]]
   name = "github.com/digitalocean/godo"
@@ -148,6 +148,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "2ef8047bb94093d90921b096c209aa6bc722d4623c0a4f8966d9edae6a5a9c71"
+  inputs-digest = "dd4dfca4668db6c871456a83ee13c3bcb843257dcb1298b4ed8b36b67a68f6f7"
   solver-name = "gps-cdcl"
   solver-version = 1

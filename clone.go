@@ -20,10 +20,18 @@ func ApplyClone(conf Config, repo Clone) *ApplyState {
 	var state ApplyState
 	fmt.Println("cloning", repo)
 	state.Output = bytes.NewBuffer([]byte("clone: " + repo.URL))
-	_, err := git.PlainClone(repo.Dest, false, &git.CloneOptions{
-		URL:               repo.URL,
-		RecurseSubmodules: git.DefaultSubmoduleRecursionDepth,
+
+	r, err := git.NewFilesystemRepository(repo.Dest)
+	if err != nil {
+		return state.Errorf("error creating repo: %v", err)
+	}
+	err = r.Clone(&git.CloneOptions{
+		URL:          repo.URL,
+		SingleBranch: true,
 	})
+	if err != nil {
+		return state.Errorf("error cloning repo: %v", err)
+	}
 
 	exists, err := pathExists(repo.Dest)
 	if err != nil {

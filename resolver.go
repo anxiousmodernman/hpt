@@ -68,8 +68,7 @@ type BucketResolver struct {
 
 // Get implements Resolver for an S3-like bucket.
 func (br *BucketResolver) Get(path string) (io.Reader, error) {
-	opts := minio.GetObjectOptions{}
-	return br.conn.GetObject(br.bucket, path, opts)
+	return br.conn.GetObject(br.bucket, path)
 }
 
 // NewBucketClient ...

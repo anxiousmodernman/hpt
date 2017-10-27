@@ -40,6 +40,19 @@ func runCommand(cmd string, args ...string) {
 	fmt.Println(string(out))
 }
 
+func copyBinaryHere() {
+	pwd, _ := os.Getwd()
+	cd := func() { os.Chdir(pwd) }
+
+	// do go build
+	os.Chdir("..")
+	os.Setenv("GOOS", "linux")
+	os.Setenv("GOARCH", "amd64")
+	runCommand("go", "build", "-o", binary)
+	runCommand("mv", binary, testDir)
+	cd()
+}
+
 // cli flags
 var (
 	keep = flag.Bool("keep", false, "whether to keep the vm online after the test is over")
@@ -54,16 +67,16 @@ func main() {
 		fmt.Printf("test duration: %v seconds\n", now.Sub(then))
 	}()
 
-	pwd, _ := os.Getwd()
-	cd := func() { os.Chdir(pwd) }
+	switch len(os.Args) {
+	case 2:
+		fmt.Println("2 args")
 
-	// do go build
-	os.Chdir("..")
-	os.Setenv("GOOS", "linux")
-	os.Setenv("GOARCH", "amd64")
-	runCommand("go", "build", "-o", binary)
-	runCommand("mv", binary, testDir)
-	cd()
+	default:
+		fmt.Println("got", len(os.Args), "args")
+	}
+	os.Exit(0)
+
+	copyBinaryHere()
 
 	// do the packer build
 	cmd := exec.Command("packer", "build", "centos7.json")

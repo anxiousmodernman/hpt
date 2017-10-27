@@ -57,7 +57,6 @@ func createDir(conf Config, f File, state *ApplyState) *ApplyState {
 }
 
 func createFile(conf Config, f File, state *ApplyState) *ApplyState {
-	// parse a path
 	resolverName, path := ParseResolverPath(f.Src)
 	if resolverName == "" {
 		panic("local resolver unsupported")

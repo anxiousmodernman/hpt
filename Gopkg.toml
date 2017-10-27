@@ -5,7 +5,7 @@
 # for detailed Gopkg.toml documentation.
 #
 # required = ["github.com/user/thing/cmd/thing"]
-# ignored = ["github.com/user/project/pkgX", "bitbucket.org/user/project/pkgA/pkgY"]
+# ignored = ["github.com/anxiousmodernman/easyssh"]
 #
 # [[constraint]]
 #   name = "github.com/user/project"
@@ -26,8 +26,9 @@
   version = "0.3.0"
 
 [[constraint]]
+  branch = "master"
   name = "github.com/anxiousmodernman/easyssh"
-  version = "0.1.0"
+
 
 [[constraint]]
   name = "github.com/digitalocean/godo"
