@@ -5,7 +5,7 @@ name = "coleman"
 
 [[file]]
 path = "/home/coleman/.ssh/hackbox"
-src = "bkt://ssh-keys/hackbox"
+source = "bkt://ssh-keys/hackbox"
 perms = 600
 owner = "coleman"
 group = "coleman"

@@ -1,9 +1,9 @@
 
-packages = ["epel-release", "git", "gcc", "libevent-devel", 
-            "automake", "ncurses-devel", "wget", "cmake", "gcc-c++",
-            "libtool", "unzip"]
+#packages = ["epel-release", "git", "gcc", "libevent-devel", 
+#            "automake", "ncurses-devel", "wget", "cmake", "gcc-c++",
+#            "libtool", "unzip"]
 
-#packages = ["git", "wget"]
+packages = ["git", "wget"]
 
 [bucket.bkt]
 url = "nyc3.digitaloceanspaces.com"
@@ -23,13 +23,13 @@ ssh_public_key = "bkt://ssh-keys/hackbox.pub"
 name = "sshd"
 status = "restarted"
 
-[[clone]]
-URL = "https://github.com/tmux/tmux.git"
-dest = "/opt/tmux"
-
-[[clone]]
-URL = "https://github.com/neovim/neovim.git"
-dest = "/opt/neovim"
+#[[clone]]
+#URL = "https://github.com/tmux/tmux.git"
+#dest = "/opt/tmux"
+#
+#[[clone]]
+#URL = "https://github.com/neovim/neovim.git"
+#dest = "/opt/neovim"
 
 # install go 
 [[exec]]

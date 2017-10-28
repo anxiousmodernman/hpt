@@ -3,14 +3,14 @@
         "do_api_token": "{{ env `DIGITALOCEAN_API_TOKEN` }}",
         "access_key": "{{ env `DO_ACCESS_KEY` }}",
         "secret_key": "{{ env `DO_SECRET_ACCESS_KEY` }}",
-        "hpt_config": "testconfig.toml",
-        "region": "nyc3"
+        "hpt_config": "hpt-dev.toml",
+        "region": "sfo2"
     },
     "builders": [
         {
             "type": "digitalocean",
-            "image": "centos-7-x64",
-            "snapshot_name": "hpt-test-{{ timestamp }}",
+            "image": "28904361",
+            "snapshot_name": "hpt-dev-{{ timestamp }}",
             "region": "{{ user `region` }}",
             "size": "512mb",
             "ssh_username": "root",
@@ -35,15 +35,12 @@
             "source": "{{user `hpt_config`}}",
             "destination": "/home/tester/{{user `hpt_config`}}"
         },
-        
         {
             "type": "shell",
             "execute_command": "echo {{user `ssh_username`}} | {{ .Vars }} sudo -E -S sh '{{ .Path }}'",
             "inline":[
                 "mv /home/tester/hpt /usr/bin/hpt",
-                "chmod +x /usr/bin/hpt",
-                "DO_ACCESS_KEY={{ user `access_key` }} DO_SECRET_ACCESS_KEY={{ user `secret_key` }} /usr/bin/hpt /home/tester/{{user `hpt_config`}}",
-                "echo path is $PATH"
+                "DO_ACCESS_KEY={{ user `access_key` }} DO_SECRET_ACCESS_KEY={{ user `secret_key` }} /usr/bin/hpt /home/tester/{{user `hpt_config`}}"
             ]
         }
     ]
