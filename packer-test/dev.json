@@ -3,7 +3,7 @@
         "do_api_token": "{{ env `DIGITALOCEAN_API_TOKEN` }}",
         "access_key": "{{ env `DO_ACCESS_KEY` }}",
         "secret_key": "{{ env `DO_SECRET_ACCESS_KEY` }}",
-        "hpt_config": "hpt-dev.toml",
+        "hpt_config": "dev.toml",
         "region": "sfo2"
     },
     "builders": [
