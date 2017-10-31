@@ -2,24 +2,26 @@ package main
 
 import (
 	"bytes"
-	"os/exec"
 )
 
+// Service ...
 type Service struct {
 	Name   string
 	Status string
 }
 
+// ApplyService ...
 func ApplyService(conf Config, svc Service) *ApplyState {
 	var state ApplyState
-	state.Output = bytes.NewBuffer([]byte("fix me"))
+	state.Output = bytes.NewBuffer([]byte("service: \n"))
 
-	if svc.Status == "restarted" {
-		cmd := exec.Command("systemctl", "restart", svc.Name)
-		err := cmd.Run()
+	switch svc.Status {
+	case "restarted":
+		out, err := ExecCommand("systemctl", "restart", svc.Name)
 		if err != nil {
 			return state.Error(err)
 		}
+		state.Output.Write(out)
 	}
 
 	return &state

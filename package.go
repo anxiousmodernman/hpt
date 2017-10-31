@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"io"
 	"os/exec"
 )
 
@@ -24,7 +23,7 @@ func ApplyInstallPackages(conf Config, packages []string) *ApplyState {
 	// this packages = [ "foo", "baz", "zaz" ] syntax into the higher level
 	// config's Packages slice. Here we represent many states with one, and
 	// return early on any error. Sad!
-	var state *ApplyState
+	state := &ApplyState{}
 	for _, pkg := range packages {
 		p := Package{pkg, Installed}
 		state = ApplyPackage(conf, p)
@@ -54,16 +53,11 @@ func ApplyPackage(conf Config, p Package) *ApplyState {
 func redhatInstall(name string, output *bytes.Buffer) error {
 	cmd := exec.Command("yum", "-y", "install", name)
 
-	stdout, err := cmd.StdoutPipe()
+	out, err := cmd.Output()
 	if err != nil {
 		return err
 	}
-	defer stdout.Close()
-	err = cmd.Start()
-	if err != nil {
-		return err
-	}
-	go io.Copy(output, stdout)
-	cmd.Wait()
+	// TODO this was changed
+	output.Write(out)
 	return nil
 }
