@@ -134,12 +134,12 @@ func main() {
 func destroyServer(client *godo.Client, imageid string) error {
 	id, err := strconv.Atoi(imageid)
 	if err != nil {
-		return err
+		return fmt.Errorf("destroyServer: %v", err)
 	}
 
 	resp, err := client.Droplets.Delete(context.TODO(), id)
 	if err != nil {
-		return err
+		return fmt.Errorf("destroyServer: %v", err)
 	}
 	if resp.StatusCode != 204 {
 		return errors.New("please view DO console and clean up the vm manually")

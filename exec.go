@@ -38,6 +38,9 @@ func ApplyExec(conf Config, e Exec) *ApplyState {
 		// an alias.
 		out, err := execTempFile(e.Script, e.User, e.PWD)
 		if err != nil {
+			if out != nil {
+				state.Output.Write(out)
+			}
 			return state.Errorf("execTempFile error: %v", err)
 
 			// KEEP GOING
@@ -96,14 +99,23 @@ func execTempFile(script, as, pwd string) ([]byte, error) {
 			},
 			Setsid: true,
 		}
+
+		if err := setUserOnFile(as, f.Name(), false); err != nil {
+			return nil, err
+		}
 	}
 
 	if pwd != "" {
 		c.Dir = pwd
+	} else {
+		c.Dir = os.TempDir()
 	}
 
 	b, err := c.Output()
 	if err != nil {
+		if err, ok := err.(*exec.ExitError); ok {
+			return err.Stderr, err
+		}
 		return nil, err
 	}
 

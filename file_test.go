@@ -13,8 +13,6 @@ func TestCreateFileWithPermissions(t *testing.T) {
 		t.Skip("unfortunately, this test must run as root")
 	}
 
-	// We expect group testgroup to exist
-	// We expect user test to exist
 	if exists, _ := UserExists(testUser); !exists {
 		t.Fatalf("test prerequisite user %v must exist", testUser)
 	}
@@ -52,8 +50,8 @@ func TestCreateFileWithPermissions(t *testing.T) {
 			dir.Group = tc.group
 			dir.Owner = tc.user
 			dir.Path = tempDir
-			dir.Src = "" // no op for directories
-			dir.Perms = 0750
+			dir.Src = ""     // no op for directories
+			dir.Perms = 0750 // dir must have user execute bit to cd in
 			dir.IsDir = true
 
 			state := ApplyFile(conf, dir)
@@ -80,6 +78,15 @@ func TestCreateFileWithPermissions(t *testing.T) {
 				t.Logf("output: %s", readAllStr(state.Output))
 				t.Errorf("ApplyFile error: %v", state.Err)
 			}
+
+			// permissions test
+
+			info, err := os.Stat(filepath.Join(tempDir, tc.name))
+			if err != nil {
+				t.Errorf("stat: %v", err)
+			}
+			info.Mode()
+
 		})
 	}
 }

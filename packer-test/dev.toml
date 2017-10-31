@@ -13,7 +13,7 @@ group = "coleman"
 # we assume that coleman is a user on the box and go is installed
 [[exec]]
 script = '''
-/usr/local/go/bin/go get -u github.com/golang/dep/cmd/dep
+GOPATH=/home/coleman/go /usr/local/go/bin/go get -u github.com/golang/dep/cmd/dep
 '''
 user = "coleman"
 
