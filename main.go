@@ -43,7 +43,7 @@ func main() {
 	app.Action = func(ctx *cli.Context) error {
 		args := ctx.Args()
 		if !args.Present() {
-			return errors.New("you must provide a config file")
+			return errors.New("you must provide a state file")
 		}
 		var paths = []string{args.First()}
 		paths = append(paths, args.Tail()...)
@@ -56,6 +56,7 @@ func main() {
 var (
 	boldRed = color.New(color.FgRed).Add(color.Bold)
 	white   = color.New(color.FgWhite)
+	yellow  = color.New(color.FgYellow)
 )
 
 // run takes a sequence of paths to config files.

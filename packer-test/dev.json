@@ -9,7 +9,7 @@
     "builders": [
         {
             "type": "digitalocean",
-            "image": "28904361",
+            "image": "28907439",
             "snapshot_name": "hpt-dev-{{ timestamp }}",
             "region": "{{ user `region` }}",
             "size": "512mb",

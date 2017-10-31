@@ -43,7 +43,7 @@ func deleteUser(conf Config, u User, state *ApplyState) *ApplyState {
 	if !u.Absent {
 		panic("deleteUser should not be called if Absent is false")
 	}
-	exists, err := userExists(u.Name)
+	exists, err := UserExists(u.Name)
 	if err != nil {
 		return state.Error(err)
 	}
@@ -68,7 +68,7 @@ func deleteUser(conf Config, u User, state *ApplyState) *ApplyState {
 func createUser(conf Config, u User, state *ApplyState) *ApplyState {
 	output := bytes.NewBuffer([]byte(""))
 	state.Output = output
-	exists, err := userExists(u.Name)
+	exists, err := UserExists(u.Name)
 	if err != nil {
 		return state.Error(err)
 	}
@@ -78,6 +78,7 @@ func createUser(conf Config, u User, state *ApplyState) *ApplyState {
 			state.Outcome = Unchanged
 			return state
 		}
+		// TODO adduser not available on Arch
 		out, err := ExecCommand("adduser", u.Name)
 		if err != nil {
 			state.Output = bytes.NewBuffer(out)
@@ -87,7 +88,7 @@ func createUser(conf Config, u User, state *ApplyState) *ApplyState {
 		state.Outcome = Changed
 	}
 
-	// make home
+	// TODO(cm): make home configurable
 	pexists, err := pathExists(u.Home)
 	if err != nil {
 		return state.Error(err)
@@ -187,6 +188,16 @@ func createUser(conf Config, u User, state *ApplyState) *ApplyState {
 
 	fmt.Println("created user", u.Name)
 
+	for _, tc := range toChown {
+		same, err := ComparePermissions(tc.path, int(uid), int(gid), tc.perms)
+		if err != nil {
+			fmt.Println("compare permissions")
+			if !same {
+				fmt.Println("not same", tc.path)
+			}
+		}
+	}
+
 	// add users to groups
 	// groups must exist
 
@@ -207,7 +218,6 @@ func createUser(conf Config, u User, state *ApplyState) *ApplyState {
 
 	return state
 }
-
 func pathExists(path string) (bool, error) {
 	_, err := os.Stat(path)
 	if err == nil {
@@ -236,11 +246,25 @@ func lookupUser(name string) (*user.User, int64, int64, error) {
 	return u, uid, gid, nil
 }
 
-func userExists(name string) (bool, error) {
+// UserExists tests if a user exists.
+func UserExists(name string) (bool, error) {
 	_, err := user.Lookup(name)
 	if err != nil {
 		if _, ok := err.(user.UnknownUserError); ok {
 			// the user does not exist, swallow the error
+			return false, nil
+		}
+		return false, err
+	}
+	return true, nil
+}
+
+// GroupExists tests if a group exists.
+func GroupExists(name string) (bool, error) {
+	_, err := user.LookupGroup(name)
+	if err != nil {
+		if _, ok := err.(user.UnknownGroupError); ok {
+			// the group does not exist, swallow the error
 			return false, nil
 		}
 		return false, err

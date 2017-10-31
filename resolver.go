@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"os"
@@ -29,6 +30,9 @@ type Resolver interface {
 // the appropriate client, and returns an interface that can resolve the value.
 func BuildResolver(name string, conf Config) (Resolver, error) {
 	var found bool
+	if name == "test" {
+		return &TestResolver{}, nil
+	}
 	for k, v := range conf.Buckets {
 		if k == name {
 			// TODO extract secrets into executor config
@@ -107,4 +111,13 @@ func getParams(regEx, path string) map[string]string {
 		}
 	}
 	return m
+}
+
+// TestResolver is a resolver that always returns bytes from Get. Config fields
+// that reference "test://..." will get the TestResolver.
+type TestResolver struct {
+}
+
+func (r *TestResolver) Get(path string) (io.Reader, error) {
+	return bytes.NewBufferString("test resolver file\ntest contents\n"), nil
 }

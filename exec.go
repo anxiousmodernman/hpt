@@ -102,7 +102,12 @@ func execTempFile(script, as, pwd string) ([]byte, error) {
 		c.Dir = pwd
 	}
 
-	return c.Output()
+	b, err := c.Output()
+	if err != nil {
+		return nil, err
+	}
+
+	return b, err
 }
 
 // ExecCommand executes the given command and arguments. Stdout and stderr are

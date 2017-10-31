@@ -78,6 +78,7 @@ func (ep *ExecutionPlan) Next() func() *ApplyState {
 	case "file":
 		return func() *ApplyState {
 			f := ep.config.Files[p.I]
+			fmt.Println("returned plan for", f)
 			return ApplyFile(ep.config, f)
 		}
 	default:

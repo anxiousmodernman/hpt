@@ -28,8 +28,8 @@ var (
 	binary    = "hpt"
 	testDir   = "packer-test"
 	verbose   = true
-	devImage  = "hpt-dev.json"
-	baseImage = "centos7.json"
+	devImage  = "dev.json"
+	baseImage = "base.json"
 	sshUser   = "coleman"
 	sshKey    = os.ExpandEnv("$HOME/.ssh/hackbox")
 )

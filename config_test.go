@@ -36,7 +36,7 @@ func TestExecutionPlan(t *testing.T) {
 		{
 			name:   "test1",
 			config: "testfixtures/order.toml",
-			numFns: 5,
+			numFns: 6,
 		},
 	}
 
@@ -61,6 +61,7 @@ func TestExecutionPlan(t *testing.T) {
 				}
 				fns++
 			}
+
 			if fns != tc.numFns {
 				t.Errorf("expected %v funcs in ep, got %v", tc.numFns, fns)
 			}
