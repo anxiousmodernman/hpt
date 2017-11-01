@@ -43,17 +43,30 @@ func main() {
 	// a command
 	app.Commands = []cli.Command{
 		cli.Command{
+			Name:  "apply-ssh",
+			Flags: []cli.Flag{confFlag, sshUser, sshPrivKeyPath},
+			Usage: "run an hpt config over ssh",
+			Action: func(ctx *cli.Context) error {
+				if !args.Present() {
+					fmt.Println("you must provide an hpt config")
+					os.Exit(1)
+				}
+				user, key := ctx.String("user"), ctx.String("sshIdent")
+				err := Manage(ctx.Args().First(), user, key)
+				return err
+			},
+		},
+		cli.Command{
 			Name:  "manage",
 			Flags: []cli.Flag{confFlag, sshUser, sshPrivKeyPath},
 			Usage: "bring a box under management",
 			Action: func(ctx *cli.Context) error {
-				args := ctx.Args()
 				if !args.Present() {
 					fmt.Println("you must provide an IP to manage")
 					os.Exit(1)
 				}
 				user, key := ctx.String("user"), ctx.String("sshIdent")
-				err := Manage(args.First(), user, key)
+				err := Manage(ctx.Args().First(), user, key)
 				return err
 			},
 		},
