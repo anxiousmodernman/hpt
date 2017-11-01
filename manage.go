@@ -11,9 +11,9 @@ import (
 	"github.com/anxiousmodernman/easyssh"
 	"github.com/boltdb/bolt"
 	"github.com/pkg/errors"
-	sshlib "golang.org/x/crypto/ssh"
 
 	"github.com/Rudd-O/curvetls"
+	sshlib "golang.org/x/crypto/ssh"
 )
 
 var _ = errors.Wrap
@@ -31,18 +31,21 @@ type Keypair struct {
 // firewall for our hpt manager. We also put keys at /etc/hpt/keys/.
 func Manage(target, sshUser, sshPrivKeyPath string) error {
 
+	fmt.Println("target", target)
 	// Read main hpt toml config;
 	var mconf ManagerConfig
 	_, err := toml.DecodeFile(os.ExpandEnv("$HOME/.config/hpt/hpt.toml"), &mconf)
 	if err != nil {
 		return errors.Wrap(err, "could not open hpt.toml")
 	}
+	fmt.Println("management config:", mconf)
 	// We will connect to this IP
 	var ip string
 
 	// find our target(s) in the config by name
 	for k, v := range mconf.Hosts {
 		if k == target {
+			fmt.Println("config key", k)
 			if len(v.IPs) < 1 {
 				return errors.Errorf("expected string array ips for target: %s", target)
 			}
@@ -90,24 +93,35 @@ func Manage(target, sshUser, sshPrivKeyPath string) error {
 	})
 
 	fmt.Println("added keypair for", ip)
+	err = scpBinary(sshUser, sshPrivKeyPath, ip)
 
-	return nil
+	return err
 }
 
+// we need a sudo user for this
 func scpBinary(user, sshKey, targetIP string) error {
 	ssh := &easyssh.MakeConfig{
 		User: user, Server: targetIP, Key: sshKey,
+		// Insecure means we accept any host key. This used to be the default
+		// behavior, but that changed: https://github.com/golang/go/issues/19767
+		// Will need to configure this somehow from hpt.conf, I expect
 		HostKeyCallback: sshlib.InsecureIgnoreHostKey(),
 	}
+	fmt.Println("scp hpt binary to target...")
 	// TODO cheating here. Lookup our own binary!
 	if err := ssh.Scp("hpt"); err != nil {
 		return errors.Wrap(err, "scp failed")
 	}
+	fmt.Println("move hpt binary to", managedBinary, "...")
 	cmd := fmt.Sprintf("sudo mv hpt %s", managedBinary)
 	if _, err := ssh.Run(cmd); err != nil {
 		return errors.Wrap(err, "scp failed")
 	}
-
+	fmt.Println("make hpt executable...")
+	cmd = fmt.Sprintf("sudo chmod +x %s", managedBinary)
+	if _, err := ssh.Run(cmd); err != nil {
+		return errors.Wrap(err, "chmod +x failed")
+	}
 	return nil
 }
 

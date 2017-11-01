@@ -7,9 +7,9 @@ import (
 // ManagerConfig is configuration for our hpt manager process itself.
 type ManagerConfig struct {
 	// Hosts are our host blocks. One HostType might represent many IPs.
-	Hosts map[string]HostType
+	Hosts map[string]HostType `toml:"hosts"`
 	// KeyDB is the path to our boltdb keystore.
-	KeyDB string
+	KeyDB string `toml:"keydb"`
 }
 
 type HostType struct {
