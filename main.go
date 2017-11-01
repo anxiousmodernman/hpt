@@ -30,11 +30,21 @@ func main() {
 		Usage: "path to config",
 	}
 
+	sshUser := cli.StringFlag{
+		Name:  "user",
+		Usage: "ssh user to connect as",
+	}
+
+	sshPrivKeyPath := cli.StringFlag{
+		Name:  "sshIdent",
+		Usage: "path to private ssh key",
+	}
+
 	// a command
 	app.Commands = []cli.Command{
 		cli.Command{
 			Name:  "manage",
-			Flags: []cli.Flag{confFlag},
+			Flags: []cli.Flag{confFlag, sshUser, sshPrivKeyPath},
 			Usage: "bring a box under management",
 			Action: func(ctx *cli.Context) error {
 				args := ctx.Args()
@@ -42,7 +52,8 @@ func main() {
 					fmt.Println("you must provide an IP to manage")
 					os.Exit(1)
 				}
-				err := Manage(args.First())
+				user, key := ctx.String("user"), ctx.String("sshIdent")
+				err := Manage(args.First(), user, key)
 				return err
 			},
 		},

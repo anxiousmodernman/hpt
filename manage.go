@@ -7,38 +7,66 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/BurntSushi/toml"
+	"github.com/anxiousmodernman/easyssh"
 	"github.com/boltdb/bolt"
 	"github.com/pkg/errors"
+	sshlib "golang.org/x/crypto/ssh"
 
 	"github.com/Rudd-O/curvetls"
 )
 
 var _ = errors.Wrap
 
+var managedBinary = "/usr/local/bin/hpt"
+
 type Keypair struct {
 	Pub  curvetls.Pubkey
 	Priv curvetls.Privkey
 }
 
-func Manage(ip string) error {
+// Manage is our function to use SSH to bring a box under management. We ssh in,
+// upload the hpt binary, put the binary in /usr/bin, make it executable, install
+// our systemd service and socket files, bounce the systemd daemon, and open the
+// firewall for our hpt manager. We also put keys at /etc/hpt/keys/.
+func Manage(target, sshUser, sshPrivKeyPath string) error {
 
-	// TODO check if key exists before creating a new one
-
-	// generate a keypair
-	priv, pub, err := curvetls.GenKeyPair()
+	// Read main hpt toml config;
+	var mconf ManagerConfig
+	_, err := toml.DecodeFile(os.ExpandEnv("$HOME/.config/hpt/hpt.toml"), &mconf)
 	if err != nil {
-		return errors.Wrap(err, "could not generate key pair")
+		return errors.Wrap(err, "could not open hpt.toml")
+	}
+	// We will connect to this IP
+	var ip string
+
+	// find our target(s) in the config by name
+	for k, v := range mconf.Hosts {
+		if k == target {
+			if len(v.IPs) < 1 {
+				return errors.Errorf("expected string array ips for target: %s", target)
+			}
+			// TODO We only take the first ip for now.
+			ip = v.IPs[0]
+		}
 	}
 
-	pair := Keypair{pub, priv}
+	// TODO check if key exists before creating a new one
 
 	keystoreDir := filepath.Join(os.Getenv("HOME"), ".config", "hpt")
 	keystorePath := filepath.Join(keystoreDir, "keys.db")
 	if err := os.MkdirAll(keystoreDir, os.FileMode(0700)); err != nil {
 		return errors.Wrap(err, "error creating config dir")
 	}
-
 	fmt.Println("keystorePath:", keystorePath)
+
+	// generate a keypair
+	priv, pub, err := curvetls.GenKeyPair()
+	if err != nil {
+		return errors.Wrap(err, "could not generate key pair")
+	}
+	pair := Keypair{pub, priv}
+
 	// store in boltdb
 	db, err := bolt.Open(keystorePath, 0600, nil)
 	if err != nil {
@@ -62,6 +90,23 @@ func Manage(ip string) error {
 	})
 
 	fmt.Println("added keypair for", ip)
+
+	return nil
+}
+
+func scpBinary(user, sshKey, targetIP string) error {
+	ssh := &easyssh.MakeConfig{
+		User: user, Server: targetIP, Key: sshKey,
+		HostKeyCallback: sshlib.InsecureIgnoreHostKey(),
+	}
+	// TODO cheating here. Lookup our own binary!
+	if err := ssh.Scp("hpt"); err != nil {
+		return errors.Wrap(err, "scp failed")
+	}
+	cmd := fmt.Sprintf("sudo mv hpt %s", managedBinary)
+	if _, err := ssh.Run(cmd); err != nil {
+		return errors.Wrap(err, "scp failed")
+	}
 
 	return nil
 }
