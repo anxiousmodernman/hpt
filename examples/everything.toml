@@ -1,0 +1,29 @@
+
+# The top-level packages array is a shorthand for specifying a separate pkg 
+# install block for each item in the list.
+packages = ["git", "wget"]
+
+# bucket.<name> lets us create a named resolver that will be available to some
+# options in other blocks as "<name>://foo/baz". Here we specify a Spaces S3-like
+# bucket. Under the hood, hpt will look for the environment variables for
+# Digital Ocean's platform.
+[bucket.bkt]
+url = "nyc3.digitaloceanspaces.com"
+name = "coleman"
+
+# Here we are modifying the existing wheel group, adding in the ability for
+# group members to use sudo without a password.
+[[group]]
+name = "wheel"
+passwordless_sudo = true
+
+
+# The exec block lets us run a certain command as a specfic user. We can use a
+# multi-line string for our script.
+[[exec]]
+dir = "/opt/tmux"
+user = "root"
+script = """
+sh autoconf.sh
+./configure && make
+"""

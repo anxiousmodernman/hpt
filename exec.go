@@ -108,6 +108,7 @@ func execTempFile(script, as, pwd string) ([]byte, error) {
 	if pwd != "" {
 		c.Dir = pwd
 	} else {
+		// we run in /tmp by default
 		c.Dir = os.TempDir()
 	}
 

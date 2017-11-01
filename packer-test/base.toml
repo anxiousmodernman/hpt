@@ -23,13 +23,13 @@ ssh_public_key = "bkt://ssh-keys/hackbox.pub"
 name = "sshd"
 status = "restarted"
 
-#[[clone]]
-#URL = "https://github.com/tmux/tmux.git"
-#dest = "/opt/tmux"
+[[clone]]
+URL = "https://github.com/tmux/tmux.git"
+dest = "/opt/tmux"
 #
-#[[clone]]
-#URL = "https://github.com/neovim/neovim.git"
-#dest = "/opt/neovim"
+[[clone]]
+URL = "https://github.com/neovim/neovim.git"
+dest = "/opt/neovim"
 
 # install go 
 [[exec]]
@@ -40,9 +40,14 @@ tar -C /usr/local -xzf go1.9.1.linux-amd64.tar.gz
 '''
 
 # building neovim
-#[[exec]]
-#script = "make CMAKE_BUILD_TYPE=RelWithDebInfo"
+[[exec]]
+script = "make CMAKE_BUILD_TYPE=RelWithDebInfo"
+dir = "/opt/neovim"
 
 # installing tmux
-# sh autoconf.sh
-# ./configure && make
+[[exec]]
+script = """
+sh autoconf.sh
+./configure && make
+"""
+dir = "/opt/tmux"

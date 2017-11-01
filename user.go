@@ -170,6 +170,7 @@ func createUser(conf Config, u User, state *ApplyState) *ApplyState {
 		perms int
 	}
 
+	// TODO this is not working
 	toChown := []chown{
 		{filepath.Join(u.Home), 0755},
 		{filepath.Join(u.Home, ".ssh"), 0755},
