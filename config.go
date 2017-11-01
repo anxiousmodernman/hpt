@@ -4,6 +4,21 @@ import (
 	"github.com/BurntSushi/toml"
 )
 
+// ManagerConfig is configuration for our hpt manager process itself.
+type ManagerConfig struct {
+	// Hosts are our host blocks. One HostType might represent many IPs.
+	Hosts map[string]HostType
+	// KeyDB is the path to our boltdb keystore.
+	KeyDB string
+}
+
+type HostType struct {
+	IPs     []string `toml:"ips"`
+	HPTPort string   `toml:"hpt_port"`
+	SSHPort string   `toml:"ssh_port"`
+	// TODO(cm): support IP ranges here?
+}
+
 // Config is our container for passing any kind of applyable state.
 type Config struct {
 	InstallPackages []string          `toml:"packages"`
