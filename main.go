@@ -31,6 +31,14 @@ func main() {
 	// a command
 	app.Commands = []cli.Command{
 		cli.Command{
+			Name:  "manage",
+			Flags: []cli.Flag{confFlag},
+			Usage: "bring a box under management",
+			Action: func(ctx *cli.Context) error {
+				return nil
+			},
+		},
+		cli.Command{
 			Name:  "plan",
 			Flags: []cli.Flag{confFlag},
 			Action: func(ctx *cli.Context) error {
