@@ -3,7 +3,9 @@ package main
 import (
 	"errors"
 	"flag"
+	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 
 	"github.com/fatih/color"
@@ -35,12 +37,26 @@ func main() {
 			Flags: []cli.Flag{confFlag},
 			Usage: "bring a box under management",
 			Action: func(ctx *cli.Context) error {
-				return nil
+				args := ctx.Args()
+				if !args.Present() {
+					fmt.Println("you must provide an IP to manage")
+					os.Exit(1)
+				}
+				err := Manage(args.First())
+				return err
 			},
 		},
 		cli.Command{
 			Name:  "plan",
 			Flags: []cli.Flag{confFlag},
+			Action: func(ctx *cli.Context) error {
+				return nil
+			},
+		},
+		cli.Command{
+			Name:  "serve",
+			Flags: []cli.Flag{confFlag},
+			Usage: "start an hpt daemon",
 			Action: func(ctx *cli.Context) error {
 				return nil
 			},
@@ -58,7 +74,10 @@ func main() {
 		return run(paths...)
 	}
 
-	app.Run(os.Args)
+	if err := app.Run(os.Args); err != nil {
+		log.Fatal(err)
+	}
+
 }
 
 var (

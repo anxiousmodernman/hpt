@@ -22,6 +22,8 @@ type Keypair struct {
 
 func Manage(ip string) error {
 
+	// TODO check if key exists before creating a new one
+
 	// generate a keypair
 	priv, pub, err := curvetls.GenKeyPair()
 	if err != nil {
@@ -30,10 +32,15 @@ func Manage(ip string) error {
 
 	pair := Keypair{pub, priv}
 
-	keystorePath := filepath.Join(os.Getenv("HOME"), ".config", "hpt", "keys.db")
+	keystoreDir := filepath.Join(os.Getenv("HOME"), ".config", "hpt")
+	keystorePath := filepath.Join(keystoreDir, "keys.db")
+	if err := os.MkdirAll(keystoreDir, os.FileMode(0700)); err != nil {
+		return errors.Wrap(err, "error creating config dir")
+	}
 
+	fmt.Println("keystorePath:", keystorePath)
 	// store in boltdb
-	db, err := bolt.Open(keystorePath, os.FileMode(os.O_RDWR), nil)
+	db, err := bolt.Open(keystorePath, 0600, nil)
 	if err != nil {
 		return errors.Wrap(err, "could not open keys.db")
 	}
