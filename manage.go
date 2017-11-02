@@ -18,7 +18,7 @@ import (
 
 var _ = errors.Wrap
 
-var managedBinary = "/usr/local/bin/hpt"
+var managedBinary = "/bin/hpt"
 
 type Keypair struct {
 	Pub  curvetls.Pubkey

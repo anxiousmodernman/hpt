@@ -47,12 +47,12 @@ func main() {
 			Flags: []cli.Flag{confFlag, sshUser, sshPrivKeyPath},
 			Usage: "run an hpt config over ssh",
 			Action: func(ctx *cli.Context) error {
-				if !args.Present() {
+				if !ctx.Args().Present() {
 					fmt.Println("you must provide an hpt config")
 					os.Exit(1)
 				}
 				user, key := ctx.String("user"), ctx.String("sshIdent")
-				err := Manage(ctx.Args().First(), user, key)
+				err := ApplySSH(ctx.Args().First(), ctx.Args().Get(1), user, key)
 				return err
 			},
 		},
@@ -61,7 +61,7 @@ func main() {
 			Flags: []cli.Flag{confFlag, sshUser, sshPrivKeyPath},
 			Usage: "bring a box under management",
 			Action: func(ctx *cli.Context) error {
-				if !args.Present() {
+				if !ctx.Args().Present() {
 					fmt.Println("you must provide an IP to manage")
 					os.Exit(1)
 				}
