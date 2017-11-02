@@ -121,79 +121,80 @@ func createUser(conf Config, u User, state *ApplyState) *ApplyState {
 	}
 
 	// parse a path
-	resolverName, path := ParseResolverPath(u.SSHPublicKey)
-	if resolverName == "" {
-		panic("local resolver unsupported")
-	}
-	// look up resolver
-	resolver, err := BuildResolver(resolverName, conf)
-	if err != nil {
-		return state.Error(err)
-	}
-	r, err := resolver.Get(path)
-	if err != nil {
-		return state.Error(err)
-	}
-	if r == nil {
-		return state.Error(fmt.Errorf("path %s yielded no data", u.SSHPublicKey))
-	}
-	data, err := ioutil.ReadAll(r)
-	if err != nil {
-		return state.Error(fmt.Errorf("read error: %v", err))
-	}
-	// write the public key
-	err = ioutil.WriteFile(filepath.Join(u.Home, ".ssh", "id_rsa.pub"),
-		data, 0644)
-	if err != nil {
-		return state.Error(err)
-	}
-
-	// Append public key to authorized keys. Open with O_APPEND and all data
-	// goes to the end.
-	f, err := os.OpenFile(
-		filepath.Join(u.Home, ".ssh", "authorized_keys"),
-		os.O_APPEND|os.O_WRONLY|os.O_CREATE,
-		0644)
-	if err != nil {
-		return state.Error(fmt.Errorf("open authorized_keys: %v", err))
-	}
-	defer f.Close()
-	// append to
-	f.Write(data)
-
-	// TODO: private key
-	// pub 644
-	// authorized_keys 644
-	// priv 600
-	type chown struct {
-		path  string
-		perms int
-	}
-
-	toChown := []chown{
-		{filepath.Join(u.Home), 0755},
-		{filepath.Join(u.Home, ".ssh"), 0755},
-		{filepath.Join(u.Home, ".ssh", "id_rsa.pub"), 0644},
-		{filepath.Join(u.Home, ".ssh", "authorized_keys"), 0644},
-	}
-
-	for _, tc := range toChown {
-		if err := os.Chown(u.Home, int(uid), int(gid)); err != nil {
-			return state.Error(fmt.Errorf("chown %s: %v", tc.path, err))
+	if u.SSHPublicKey != "" {
+		resolverName, path := ParseResolverPath(u.SSHPublicKey)
+		if resolverName == "" {
+			panic("local resolver unsupported")
 		}
-		if err := os.Chmod(tc.path, os.FileMode(tc.perms)); err != nil {
-			return state.Error(fmt.Errorf("chmod %s: %v", tc.path, err))
-		}
-	}
-
-	fmt.Println("created user", u.Name)
-
-	for _, tc := range toChown {
-		same, err := ComparePermissions(tc.path, int(uid), int(gid), tc.perms)
+		// look up resolver
+		resolver, err := BuildResolver(resolverName, conf)
 		if err != nil {
-			fmt.Println("compare permissions")
-			if !same {
-				fmt.Println("not same", tc.path)
+			return state.Error(err)
+		}
+		r, err := resolver.Get(path)
+		if err != nil {
+			return state.Error(err)
+		}
+		if r == nil {
+			return state.Error(fmt.Errorf("path %s yielded no data", u.SSHPublicKey))
+		}
+		data, err := ioutil.ReadAll(r)
+		if err != nil {
+			return state.Error(fmt.Errorf("read error: %v", err))
+		}
+		// write the public key
+		err = ioutil.WriteFile(filepath.Join(u.Home, ".ssh", "id_rsa.pub"),
+			data, 0644)
+		if err != nil {
+			return state.Error(err)
+		}
+		// Append public key to authorized keys. Open with O_APPEND and all data
+		// goes to the end.
+		f, err := os.OpenFile(
+			filepath.Join(u.Home, ".ssh", "authorized_keys"),
+			os.O_APPEND|os.O_WRONLY|os.O_CREATE,
+			0644)
+		if err != nil {
+			return state.Error(fmt.Errorf("open authorized_keys: %v", err))
+		}
+		defer f.Close()
+		// append to
+		f.Write(data)
+		// TODO: private key
+		// pub 644
+		// authorized_keys 644
+		// priv 600
+		type chown struct {
+			path  string
+			perms int
+		}
+
+		// TODO this is not working
+		toChown := []chown{
+			{filepath.Join(u.Home), 0755},
+			{filepath.Join(u.Home, ".ssh"), 0755},
+			{filepath.Join(u.Home, ".ssh", "id_rsa.pub"), 0644},
+			{filepath.Join(u.Home, ".ssh", "authorized_keys"), 0644},
+		}
+
+		for _, tc := range toChown {
+			if err := os.Chown(u.Home, int(uid), int(gid)); err != nil {
+				return state.Error(fmt.Errorf("chown %s: %v", tc.path, err))
+			}
+			if err := os.Chmod(tc.path, os.FileMode(tc.perms)); err != nil {
+				return state.Error(fmt.Errorf("chmod %s: %v", tc.path, err))
+			}
+		}
+
+		fmt.Println("created user", u.Name)
+
+		for _, tc := range toChown {
+			same, err := ComparePermissions(tc.path, int(uid), int(gid), tc.perms)
+			if err != nil {
+				fmt.Println("compare permissions")
+				if !same {
+					fmt.Println("not same", tc.path)
+				}
 			}
 		}
 	}

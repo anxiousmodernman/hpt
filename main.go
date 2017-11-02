@@ -3,7 +3,9 @@ package main
 import (
 	"errors"
 	"flag"
+	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 
 	"github.com/fatih/color"
@@ -28,11 +30,57 @@ func main() {
 		Usage: "path to config",
 	}
 
+	sshUser := cli.StringFlag{
+		Name:  "user",
+		Usage: "ssh user to connect as",
+	}
+
+	sshPrivKeyPath := cli.StringFlag{
+		Name:  "sshIdent",
+		Usage: "path to private ssh key",
+	}
+
 	// a command
 	app.Commands = []cli.Command{
 		cli.Command{
+			Name:  "apply-ssh",
+			Flags: []cli.Flag{confFlag, sshUser, sshPrivKeyPath},
+			Usage: "run an hpt config over ssh",
+			Action: func(ctx *cli.Context) error {
+				if !ctx.Args().Present() {
+					fmt.Println("you must provide an hpt config")
+					os.Exit(1)
+				}
+				user, key := ctx.String("user"), ctx.String("sshIdent")
+				err := ApplySSH(ctx.Args().First(), ctx.Args().Get(1), user, key)
+				return err
+			},
+		},
+		cli.Command{
+			Name:  "manage",
+			Flags: []cli.Flag{confFlag, sshUser, sshPrivKeyPath},
+			Usage: "bring a box under management",
+			Action: func(ctx *cli.Context) error {
+				if !ctx.Args().Present() {
+					fmt.Println("you must provide an IP to manage")
+					os.Exit(1)
+				}
+				user, key := ctx.String("user"), ctx.String("sshIdent")
+				err := Manage(ctx.Args().First(), user, key)
+				return err
+			},
+		},
+		cli.Command{
 			Name:  "plan",
 			Flags: []cli.Flag{confFlag},
+			Action: func(ctx *cli.Context) error {
+				return nil
+			},
+		},
+		cli.Command{
+			Name:  "serve",
+			Flags: []cli.Flag{confFlag},
+			Usage: "start an hpt daemon",
 			Action: func(ctx *cli.Context) error {
 				return nil
 			},
@@ -50,7 +98,10 @@ func main() {
 		return run(paths...)
 	}
 
-	app.Run(os.Args)
+	if err := app.Run(os.Args); err != nil {
+		log.Fatal(err)
+	}
+
 }
 
 var (
