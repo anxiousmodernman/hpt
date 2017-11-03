@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -28,10 +27,9 @@ type File struct {
 
 // ApplyFile ...
 func ApplyFile(conf Config, f File) *ApplyState {
-	state := &ApplyState{}
-	state.Output = bytes.NewBuffer([]byte("file apply:"))
+	state := NewApplyState("file")
 
-	// prerequisites
+	// prerequisites on our File block configuration
 	if !filepath.IsAbs(f.Path) {
 		return state.Error(errors.New("filepath must be absolute"))
 	}
@@ -45,13 +43,12 @@ func ApplyFile(conf Config, f File) *ApplyState {
 		}
 	}
 
+	// it's not a remove, so we create
+
 	if f.IsDir {
 		return createDir(conf, f, state)
 	}
 
-	fmt.Println("config!", conf)
-	fmt.Println("file!", f)
-	// it's not a remove, so we create
 	return createFile(conf, f, state)
 }
 

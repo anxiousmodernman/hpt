@@ -32,6 +32,50 @@ func NewApplyState(name string) *ApplyState {
 	return a
 }
 
+// RenderShell lets us print the outcome of each apply.
+func (a *ApplyState) RenderShell() []byte {
+
+	/*
+		+------------------------
+		 NAME
+		 OUTCOME
+		 ATTR: FOO
+		 ATTR: BAZ
+		 ERROR: <the err.Error() output>
+		 OUTPUT: <buffer>
+	*/
+
+	output := bytes.NewBuffer([]byte("+------------------------\n"))
+
+	write := func(key string, value interface{}) {
+		if value == nil {
+			return
+		}
+		switch value.(type) {
+		case State:
+			formatted := fmt.Sprintf(" %s: %v\n", key, value)
+			output.WriteString(formatted)
+		case string:
+			formatted := fmt.Sprintf(" %s: %s\n", key, value)
+			output.WriteString(formatted)
+		case error:
+			formatted := fmt.Sprintf(" %s: %v\n", key, value)
+			output.WriteString(formatted)
+		case *bytes.Buffer:
+			formatted := fmt.Sprintf(" %s: ", key)
+			output.WriteString(formatted)
+			buf := value.(*bytes.Buffer)
+			output.Write(buf.Bytes())
+		}
+	}
+
+	write("NAME", a.Name)
+	write("OUTCOME", a.Outcome)
+	write("ERROR", a.Err)
+	write("OUTPUT", a.Output)
+	return output.Bytes()
+}
+
 // Error lets us concisely set an error on our ApplyState as a tail call in
 // one of our apply functions.
 func (a *ApplyState) Error(err error) *ApplyState {

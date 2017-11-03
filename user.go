@@ -28,8 +28,8 @@ type User struct {
 func ApplyUser(u User, conf Config) *ApplyState {
 	// NOTE: ApplyX funcs decide WHAT to do, and delegate to functions that know
 	// HOW to do it.
-	state := &ApplyState{}
-	state.Output = bytes.NewBuffer([]byte(""))
+
+	state := NewApplyState("user")
 
 	if u.Absent {
 		// delete the user if absent = true
