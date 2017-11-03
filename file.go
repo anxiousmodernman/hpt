@@ -79,11 +79,8 @@ func createDir(conf Config, f File, state *ApplyState) *ApplyState {
 }
 
 func createFile(conf Config, f File, state *ApplyState) *ApplyState {
-	fmt.Println("try to create file:", f)
 	resolverName, path := ParseResolverPath(f.Src)
 	if resolverName == "" {
-		fmt.Println("resolverName", resolverName)
-		fmt.Println("path", path)
 		panic("local resolver unsupported")
 	}
 	resolver, err := BuildResolver(resolverName, conf)
