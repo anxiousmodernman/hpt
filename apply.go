@@ -9,6 +9,9 @@ import (
 // State represents the ultimate state of an apply call.
 type State string
 
+// String implements Stringer.
+func (s State) String() string { return string(s) }
+
 // possible states
 const (
 	Unchanged State = "unchanged"

@@ -42,7 +42,7 @@ func ApplyExec(conf Config, e Exec) *ApplyState {
 		state.Output.Write(out)
 	}
 
-	return &state
+	return state
 }
 
 func execTempFile(script, as, pwd string) ([]byte, error) {

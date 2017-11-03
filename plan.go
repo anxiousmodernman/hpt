@@ -110,14 +110,12 @@ func NewExecutionPlan(conf Config) (*ExecutionPlan, error) {
 	// don't need to preserve the order of resolvers. They're application data
 	// and plain serialization into the Config is enough.
 	var plan []TypeIndex
-	for i, key := range filterValid(conf.keys) {
-		_, _ = i, key
-		fmt.Println("valid key", key)
+	for _, key := range filterValid(conf.keys) {
 		indices[key]++
 		plan = append(plan, TypeIndex{indices[key], key})
 	}
 	ep.plan = plan
-	fmt.Println("plan is", ep.plan)
+	fmt.Println("PLAN", ep.plan)
 
 	return &ep, nil
 }

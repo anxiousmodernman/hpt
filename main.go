@@ -4,7 +4,6 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 
@@ -110,8 +109,10 @@ func main() {
 
 var (
 	boldRed = color.New(color.FgRed).Add(color.Bold)
+	red     = color.New(color.FgRed)
 	white   = color.New(color.FgWhite)
 	yellow  = color.New(color.FgYellow)
+	blue    = color.New(color.FgBlue)
 )
 
 // run takes a sequence of paths to config files.
@@ -120,18 +121,11 @@ func run(paths ...string) error {
 	// TODO support multiple configs
 	path := paths[0]
 
-	printStates := func(stage string, as []*ApplyState) {
-		for _, s := range as {
-			if s.Err != nil {
-				boldRed.Printf("%s apply error: %v\n", stage, s.Err)
-			}
-			output, err := ioutil.ReadAll(s.Output)
-			if err != nil {
-				boldRed.Print("could not read output\n")
-				continue
-			}
-			white.Println(string(output))
+	printState := func(s *ApplyState) {
+		if s.Err != nil {
+			red.Print(string(s.RenderShell()))
 		}
+		blue.Println(string(s.RenderShell()))
 	}
 	conf, err := NewConfig(path)
 	if err != nil {
@@ -141,16 +135,14 @@ func run(paths ...string) error {
 	if err != nil {
 		return err
 	}
-	var as []*ApplyState
 	for {
 		fn := ep.Next()
 		if fn == nil {
 			break
 		}
 		state := fn()
-		as = append(as, state)
+		printState(state)
 	}
-	printStates("everything:", as)
 
 	return nil
 }

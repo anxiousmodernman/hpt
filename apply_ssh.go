@@ -11,6 +11,8 @@ import (
 	sshlib "golang.org/x/crypto/ssh"
 )
 
+// ApplySSH implements the `apply-ssh` command. As a separate command, it only
+// returns an error and prints to the console internally.
 func ApplySSH(target, conf, user, sshKey string) error {
 
 	var mconf ManagerConfig
@@ -22,7 +24,6 @@ func ApplySSH(target, conf, user, sshKey string) error {
 	var targetIP string
 	for k, v := range mconf.Hosts {
 		if k == target {
-			fmt.Println("config key", k)
 			if len(v.IPs) < 1 {
 				return errors.Errorf("expected string array ips for target: %s", target)
 			}
@@ -50,11 +51,10 @@ func ApplySSH(target, conf, user, sshKey string) error {
 	if _, err := ssh.Run(cmd); err != nil {
 		return errors.Wrap(err, "scp failed")
 	}
-	fmt.Println("execute hpt with config")
 	cmd = fmt.Sprintf("sudo hpt %s", confPath)
 	output, done, err := ssh.Stream(cmd)
 	if err != nil {
-		return errors.Wrap(err, "chmod +x failed")
+		return errors.Wrap(err, "hpt error")
 	}
 
 	go func() {
@@ -68,10 +68,9 @@ func ApplySSH(target, conf, user, sshKey string) error {
 		}
 	}()
 
-	fmt.Println("clean up")
 	cleanup := fmt.Sprintf("sudo rm %s", confPath)
 	if _, err := ssh.Run(cleanup); err != nil {
-		return errors.Wrap(err, "chmod +x failed")
+		return errors.Wrap(err, "rm failed")
 	}
 	return nil
 }

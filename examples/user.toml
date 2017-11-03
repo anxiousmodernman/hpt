@@ -4,5 +4,5 @@
 [[user]]
 name = "skipper"
 home = "/home/skipper"
-absent = true
+#absent = true
 
