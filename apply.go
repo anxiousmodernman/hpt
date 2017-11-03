@@ -7,20 +7,25 @@ import (
 )
 
 // State represents the ultimate state of an apply call.
-type State int
+type State string
 
 // possible states
 const (
-	Unchanged State = 0
-	Changed   State = 1
+	Unchanged State = "unchanged"
+	Changed   State = "changed"
 )
 
-// ApplyState is the return type of all our applies.
+// ApplyState is the return type of all our apply functions. A
 type ApplyState struct {
-	Name    string
-	Output  *bytes.Buffer
-	Err     error
+	// Err is set if an error occurs in an apply function
+	Err error
+	// Name will take the name of the configuration block. E.g. "user" for
+	// a [[user]] block
+	Name string
+	// Outcome is set to changed if any stateful function is called
 	Outcome State
+	// Output is a buffer where we can collect the output of subprocesses
+	Output *bytes.Buffer
 }
 
 // NewApplyState is a convenience constructor for an ApplyState.
@@ -30,50 +35,6 @@ func NewApplyState(name string) *ApplyState {
 		Output: bytes.NewBuffer([]byte("")),
 	}
 	return a
-}
-
-// RenderShell lets us print the outcome of each apply.
-func (a *ApplyState) RenderShell() []byte {
-
-	/*
-		+------------------------
-		 NAME
-		 OUTCOME
-		 ATTR: FOO
-		 ATTR: BAZ
-		 ERROR: <the err.Error() output>
-		 OUTPUT: <buffer>
-	*/
-
-	output := bytes.NewBuffer([]byte("+------------------------\n"))
-
-	write := func(key string, value interface{}) {
-		if value == nil {
-			return
-		}
-		switch value.(type) {
-		case State:
-			formatted := fmt.Sprintf(" %s: %v\n", key, value)
-			output.WriteString(formatted)
-		case string:
-			formatted := fmt.Sprintf(" %s: %s\n", key, value)
-			output.WriteString(formatted)
-		case error:
-			formatted := fmt.Sprintf(" %s: %v\n", key, value)
-			output.WriteString(formatted)
-		case *bytes.Buffer:
-			formatted := fmt.Sprintf(" %s: ", key)
-			output.WriteString(formatted)
-			buf := value.(*bytes.Buffer)
-			output.Write(buf.Bytes())
-		}
-	}
-
-	write("NAME", a.Name)
-	write("OUTCOME", a.Outcome)
-	write("ERROR", a.Err)
-	write("OUTPUT", a.Output)
-	return output.Bytes()
 }
 
 // Error lets us concisely set an error on our ApplyState as a tail call in
@@ -94,4 +55,44 @@ func (a *ApplyState) Error(err error) *ApplyState {
 func (a *ApplyState) Errorf(format string, err error) *ApplyState {
 	a.Err = fmt.Errorf(format, err)
 	return a
+}
+
+// RenderShell lets us print the outcome of each apply.
+func (a *ApplyState) RenderShell() []byte {
+
+	/*
+		+------------------------
+		 NAME
+		 OUTCOME
+		 ATTR: FOO
+		 ATTR: BAZ
+		 ERROR: <the err.Error() output>
+		 OUTPUT: <buffer>
+	*/
+
+	output := bytes.NewBuffer([]byte("\n+------------------------\n"))
+
+	write := func(key string, value interface{}) {
+		if value == nil {
+			return
+		}
+		switch value.(type) {
+		case State:
+			output.WriteString(fmt.Sprintf(" %s: %v\n", key, value))
+		case string:
+			output.WriteString(fmt.Sprintf(" %s: %s\n", key, value))
+		case error:
+			output.WriteString(fmt.Sprintf(" %s: %v\n", key, value))
+		case *bytes.Buffer:
+			output.WriteString(fmt.Sprintf(" %s: \n", key))
+			buf := value.(*bytes.Buffer)
+			output.Write(buf.Bytes())
+		}
+	}
+
+	write("NAME", a.Name)
+	write("OUTCOME", a.Outcome)
+	write("ERROR", a.Err)
+	write("OUTPUT", a.Output)
+	return output.Bytes()
 }

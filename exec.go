@@ -28,14 +28,9 @@ type Exec struct {
 
 // ApplyExec ...
 func ApplyExec(conf Config, e Exec) *ApplyState {
-	var state ApplyState
+	state := NewApplyState("exec")
 
 	if e.Script != "" {
-		state.Output = bytes.NewBufferString("script output:")
-		// NOTE: shelling out to a multi-line script is tricky. We want to
-		// pass each line in a script block to /bin/bash -c "line arg arg2", but
-		// we first need to test that the command is not a shell builtin or
-		// an alias.
 		out, err := execTempFile(e.Script, e.User, e.PWD)
 		if err != nil {
 			if out != nil {
@@ -43,8 +38,6 @@ func ApplyExec(conf Config, e Exec) *ApplyState {
 			}
 			return state.Errorf("execTempFile error: %v", err)
 
-			// KEEP GOING
-			// return &state
 		}
 		state.Output.Write(out)
 	}
@@ -53,26 +46,28 @@ func ApplyExec(conf Config, e Exec) *ApplyState {
 }
 
 func execTempFile(script, as, pwd string) ([]byte, error) {
+
 	f, err := ioutil.TempFile("", "hpt-script")
 	if err != nil {
 		return nil, err
 	}
 	defer func() { os.Remove(f.Name()) }()
+
 	_, err = io.Copy(f, bytes.NewBufferString(script))
 	if err != nil {
 		return nil, err
 	}
-	err = f.Close()
-	if err != nil {
+
+	if err := f.Close(); err != nil {
 		return nil, err
 	}
+
 	fqp := filepath.Join(f.Name())
 	err = os.Chmod(fqp, 0700)
 	if err != nil {
 		return nil, fmt.Errorf("chmod err: %v", err)
 
 	}
-	fmt.Println("executing temp script:", fqp)
 
 	c := exec.Command("/bin/sh", fqp)
 	if as != "" {
@@ -114,6 +109,7 @@ func execTempFile(script, as, pwd string) ([]byte, error) {
 
 	b, err := c.Output()
 	if err != nil {
+		// normally state.Error does this for us
 		if err, ok := err.(*exec.ExitError); ok {
 			return err.Stderr, err
 		}

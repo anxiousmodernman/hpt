@@ -235,6 +235,7 @@ func pathExists(path string) (bool, error) {
 func lookupUser(name string) (*user.User, int64, int64, error) {
 	u, err := user.Lookup(name)
 	if err != nil {
+		// the caller can check for user.UnknownUserError
 		return nil, 0, 0, err
 	}
 	uid, err := strconv.ParseInt(u.Uid, 10, 32)

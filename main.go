@@ -93,6 +93,10 @@ func main() {
 		if !args.Present() {
 			return errors.New("you must provide a state file")
 		}
+		if args.First() == "ssh-apply" {
+			fmt.Println("did you mean \"apply-ssh\"?")
+			os.Exit(1)
+		}
 		var paths = []string{args.First()}
 		paths = append(paths, args.Tail()...)
 		return run(paths...)
