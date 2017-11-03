@@ -39,7 +39,6 @@ func main() {
 		Usage: "path to private ssh key",
 	}
 
-	// a command
 	app.Commands = []cli.Command{
 		cli.Command{
 			Name:  "apply-ssh",
