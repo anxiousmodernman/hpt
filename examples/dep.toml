@@ -1,0 +1,8 @@
+# Install dep, a Go dependency management tool.
+
+[[exec]]
+script = """
+GOPATH=/home/colemango get -u github.com/golang/dep/cmd/dep"
+"""
+user = "coleman"
+
