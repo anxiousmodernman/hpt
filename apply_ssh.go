@@ -32,10 +32,7 @@ func ApplySSH(target, conf, user, sshKey string) error {
 		}
 	}
 	// we expect hpt to be installed
-	fmt.Println("target", targetIP)
-	fmt.Println("config", conf)
 	_, confName := filepath.Split(conf)
-	fmt.Println("confName", confName)
 
 	ssh := &easyssh.MakeConfig{
 		User: user, Server: targetIP, Key: sshKey,
@@ -52,6 +49,7 @@ func ApplySSH(target, conf, user, sshKey string) error {
 		return errors.Wrap(err, "scp failed")
 	}
 	cmd = fmt.Sprintf("sudo hpt %s", confPath)
+	// could we do json over this line-oriented stream?
 	output, done, err := ssh.Stream(cmd)
 	if err != nil {
 		return errors.Wrap(err, "hpt error")

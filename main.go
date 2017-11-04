@@ -120,9 +120,11 @@ func run(paths ...string) error {
 	// TODO support multiple configs
 	path := paths[0]
 
+	// colors don't work over ssh
 	printState := func(s *ApplyState) {
 		if s.Err != nil {
 			red.Print(string(s.RenderShell()))
+			return
 		}
 		blue.Println(string(s.RenderShell()))
 	}

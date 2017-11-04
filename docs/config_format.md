@@ -135,7 +135,8 @@ user = "someone"
 The following attributes are supported:
 
 **script** - a multi-line string that will be interpreted as a script. The 
-string is written to a temporary location and executed.
+string is written to a temporary location and executed. You should rely on fully
+qualified paths to files and executables in a script.
 
 **user** - the user to run the script as.
 
