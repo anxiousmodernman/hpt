@@ -172,3 +172,18 @@ leading 0.
 
 ## service
 
+The `[[service]]` block is a wrapper around `systemctl`.
+
+```toml
+[[service]]
+status = "started"
+enabled = true
+```
+
+The following attributes are supported:
+
+**status** - one of: started, restarted, stopped
+
+**enabled** - if true, the service will start on boot
+
+
