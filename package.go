@@ -42,6 +42,7 @@ func ApplyPackage(conf Config, p Package) *ApplyState {
 	// pointer dance; we should probably just make the field a bytes.Buffer
 	state.Output = output
 
+	// TODO pick a system implementation, e.g. ubuntu vs redhat
 	switch p.State {
 	case Installed:
 		return state.Error(redhatInstall(p.Name, output))

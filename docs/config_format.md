@@ -17,6 +17,7 @@ A `[[package]]` block installs or uninstalls a package using the standard system
 package manager. This is `apt` on Debian systems and `yum` on Centos systems.
 
 ```toml
+# note only shorthand 'packages' is implemented currently
 [[package]]
 name = "nginx"
 state = "installed"
@@ -39,6 +40,46 @@ package repositories.
 
 
 ## user
+
+A `[[user]]` block manages users on the system.
+
+```toml
+[[user]]
+name = "carlos"
+home = "/home/carlos"
+groups = ["wheel"]
+ssh_public_key = "bkt://key.pub"
+ssh_private_key = "bkt://key"
+shell = "/bin/bash"
+absent = false
+```
+
+The following attributes are supported:
+
+**name** - The name of the user
+
+**home** - The home directory to create for the user. No home is created if this
+attribute is blank.
+
+**groups** - An array of groups the user should be added to. Groups must exist 
+or be previously created with a `[[group]]` block.
+
+**ssh_public_key** - A valid resolver path (such as a bucket) where a public key
+can be fetched as bytes and written to disk at `$HOME/.ssh/id_rsa.pub` for the user.
+
+**ssh_private_key** - A valid resolver path (such as a bucket) where a private
+key can be fetched as bytes and written to disk at `$HOME/.ssh/id_rsa` for the 
+user.
+
+**shell** - The login shell for the user. 
+
+**absent** - A boolean that indicates whether a user should be present or absent
+on a system. Note that if `false` is applied, a user will be deleted, but some
+filesystem artifacts (like the home directory) will remain.
+
+
+## group
+
 
 ## clone
 
