@@ -1,28 +1,27 @@
 package main
 
-import (
-	"bytes"
-)
-
 // Service ...
 type Service struct {
-	Name   string
-	Status string
+	Name    string
+	Status  string
+	Enabled bool
 }
 
 // ApplyService ...
 func ApplyService(conf Config, svc Service) *ApplyState {
-	var state ApplyState
-	state.Output = bytes.NewBuffer([]byte("service: \n"))
 
-	switch svc.Status {
-	case "restarted":
-		out, err := ExecCommand("systemctl", "restart", svc.Name)
-		if err != nil {
-			return state.Error(err)
-		}
-		state.Output.Write(out)
+	statusMap := map[string]string{
+		"restarted": "restart",
+		"started":   "start",
+		"stopped":   "stop",
 	}
+	state := NewApplyState("service")
 
-	return &state
+	out, err := ExecCommand("systemctl", statusMap[svc.Status], svc.Name)
+	if err != nil {
+		return state.Error(err)
+	}
+	state.Output.Write(out)
+
+	return state
 }
