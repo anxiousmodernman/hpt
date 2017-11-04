@@ -143,5 +143,32 @@ string is written to a temporary location and executed.
 
 ## file
 
+The file block manages files and directories. 
+
+```toml
+[[file]]
+path = "/opt/dest"
+source = "bkt://some/file"
+perms = 0600
+dir = false
+owner = "someone"
+group = "someone"
+```
+
+The following attributes are supported:
+
+**path** - the path on disk the file block represents
+
+**source** - a resolver path to the file
+
+**perms** - permissions for the file, in octal. To specify octal you must have a
+leading 0.
+
+**dir** - if true, the file block will be interpreted as a directory.
+
+**owner, group** - user and group ownership for the file 
+
+**absent** - if true, the file(s) on disk will be removed.
+
 ## service
 
