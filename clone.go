@@ -1,15 +1,16 @@
 package main
 
 import (
-	"bytes"
 	"fmt"
 
 	git "gopkg.in/src-d/go-git.v4"
 )
 
+// Clone maps the `[[clone]]` block
 type Clone struct {
-	URL      string `toml:"url"`
-	Dest     string `toml:"dest"`
+	URL  string `toml:"url"`
+	Dest string `toml:"dest"`
+	// TODO User, Key, Password don't do anything yet
 	User     string `toml:"user"`
 	Key      string `toml:"key"`
 	Password string `toml:"password"`
@@ -17,9 +18,7 @@ type Clone struct {
 
 // ApplyClone clones a repository to disk.
 func ApplyClone(conf Config, repo Clone) *ApplyState {
-	var state ApplyState
-	fmt.Println("cloning", repo)
-	state.Output = bytes.NewBuffer([]byte("clone: " + repo.URL))
+	state := NewApplyState("clone")
 
 	r, err := git.NewFilesystemRepository(repo.Dest)
 	if err != nil {
@@ -42,5 +41,5 @@ func ApplyClone(conf Config, repo Clone) *ApplyState {
 			"expected path to exist after clone: %s", repo.Dest))
 	}
 
-	return &state
+	return state
 }

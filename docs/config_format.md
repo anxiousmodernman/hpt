@@ -80,10 +80,66 @@ filesystem artifacts (like the home directory) will remain.
 
 ## group
 
+The `[[group]]` block manages groups on a system.
+
+```toml
+[[group]]
+name = "devs"
+gid = "1099"
+passwordless_sudo = true
+```
+
+The following attributes are supported:
+
+**name** - the name of the group
+
+**gid** - a GID for the group. If none is provided, the system will assign one. 
+A provided GID must not be in use.
+
+**passwordless_sudo** - if set, hpt will modify **/etc/sudoers** such that group
+members can use sudo without a password.
+
+**absent** - a boolean that indicates whether a group should be on the system.
+If true, hpt will attempt to remove the group. 
+
 
 ## clone
 
+The `[[clone]]` block clones a git repository to disk. Only cloning public repos
+is currently supported. Authenticated repos are a TODO.
+
+```toml
+[[clone]]
+url = "https://git.foo.com/project"
+dest = "/opt/project"
+```
+
+The following attributes are supported:
+
+**url** - a valid git repository url
+
+**dest** - a directory on disk to clone into
+
 ## exec
+
+The `[[exec]]` block supports arbitrary command execution. 
+
+```toml
+[[exec]]
+script = """
+mv foo.txt /tmp
+"""
+user = "someone"
+```
+
+The following attributes are supported:
+
+**script** - a multi-line string that will be interpreted as a script. The 
+string is written to a temporary location and executed.
+
+**user** - the user to run the script as.
+
+**pwd** - the directory to run the exec block from. Defaults to **/tmp**.
 
 ## file
 
