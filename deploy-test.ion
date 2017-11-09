@@ -1,0 +1,9 @@
+#!/usr/bin/env ion
+
+# do a local build
+go build
+
+# copy build up
+hpt manage dev --user="coleman" --sshIdent="/home/coleman/.ssh/hackbox"
+
+
