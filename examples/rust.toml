@@ -1,0 +1,10 @@
+
+# TODO: this doesn't work. The rustup script is designed to be interactive, so 
+# we need to figure out the flags or just steal the internals.
+[[exec]]
+script = """
+curl https://sh.rustup.rs -o /tmp/rustup.sh
+chmod +x /tmp/rustup.sh
+sh -C "/tmp/rustup.sh -y"
+"""
+
