@@ -14,7 +14,16 @@ The hope is that by focusing on robust local execution first, we can design a
 tool that feels similar whether it's being run locally or over a network.
 
 * [x] local execution - run hpt during a packer build or straight up "on the box" 
-* [ ] remote execution - SSH? gRPC? It's TBD.
+
+
+
+
+
+
+
+
+
+
 
 ## Usage: on the host 
 
