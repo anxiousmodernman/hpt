@@ -14,6 +14,7 @@ import (
 
 // File ...
 type File struct {
+	// TODO Path can also be a resolver path?
 	Path string `toml:"path"`
 	// Src is a resolver path
 	Src    string `toml:"source"`
@@ -27,6 +28,7 @@ type File struct {
 
 // ApplyFile ...
 func ApplyFile(conf Config, f File) *ApplyState {
+	// state is our custom return type
 	state := NewApplyState("file")
 
 	// prerequisites on our File block configuration

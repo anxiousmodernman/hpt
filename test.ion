@@ -1,0 +1,7 @@
+#!/usr/bin/env ion
+
+echo "building latest"
+go install
+
+hpt apply-ssh dev devtest.toml --user="coleman" --sshIdent="/home/coleman/.ssh/hackbox"
+

@@ -1,0 +1,16 @@
+# An hpt config for testing the hpt source code.
+
+[[exec]]
+script = """
+git checkout master
+git pull --rebase origin master
+"""
+user = "coleman"
+pwd = "/home/coleman/go/src/github.com/anxiousmodernman/hpt"
+
+# We need to pass full paths here because we are root, and we 
+[[exec]]
+script = """
+/usr/local/bin/go/bin/go test
+"""
+pwd = "/home/coleman/go/src/github.com/anxiousmodernman/hpt"
