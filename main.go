@@ -18,7 +18,6 @@ var (
 	confPath = flag.String("conf", "", "path to config file")
 )
 
-// automation for small infrastructures
 func main() {
 
 	app := cli.NewApp()
@@ -52,6 +51,7 @@ func main() {
 
 	app.Commands = []cli.Command{
 		cli.Command{
+			// TODO deprecate in favor of grpc
 			Name: "apply-ssh",
 			Flags: []cli.Flag{confFlag, sshUser, sshPrivKeyPath, doAccessKey,
 				doSecretAccessKey},
@@ -85,6 +85,7 @@ func main() {
 			Name:  "plan",
 			Flags: []cli.Flag{confFlag},
 			Action: func(ctx *cli.Context) error {
+				// TODO
 				return nil
 			},
 		},
@@ -116,7 +117,6 @@ func main() {
 	if err := app.Run(os.Args); err != nil {
 		log.Fatal(err)
 	}
-
 }
 
 var (

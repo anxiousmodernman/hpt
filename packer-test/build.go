@@ -62,15 +62,7 @@ func main() {
 	}
 
 	var image string
-	switch os.Args[1] {
-	case "dev":
-		image = devImage
-	case "base":
-		image = baseImage
-	default:
-		fmt.Println(usage)
-		os.Exit(1)
-	}
+	image = fmt.Sprintf("%s.json", os.Args[1])
 
 	copyBinaryHere()
 
@@ -128,7 +120,6 @@ func main() {
 		later()
 		log.Fatal(err)
 	}
-	return
 }
 
 func destroyServer(client *godo.Client, imageid string) error {

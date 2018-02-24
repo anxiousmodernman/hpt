@@ -177,11 +177,14 @@ The `[[service]]` block is a wrapper around `systemctl`.
 
 ```toml
 [[service]]
+name = "nginx"
 status = "started"
 enabled = true
 ```
 
 The following attributes are supported:
+
+**name** - the name that systemd will recognize
 
 **status** - one of: started, restarted, stopped
 
