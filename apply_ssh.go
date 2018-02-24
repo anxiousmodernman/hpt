@@ -48,7 +48,9 @@ func ApplySSH(target, conf, user, sshKey string) error {
 	if _, err := ssh.Run(cmd); err != nil {
 		return errors.Wrap(err, "scp failed")
 	}
-	cmd = fmt.Sprintf("sudo hpt %s", confPath)
+	// TODO get rid of this hardcoding
+	cmd = fmt.Sprintf("sudo DO_ACCESS_KEY=%s DO_SECRET_ACCESS_KEY=%s hpt %s",
+		os.Getenv("DO_ACCESS_KEY"), os.Getenv("DO_SECRET_ACCESS_KEY"), confPath)
 	// could we do json over this line-oriented stream?
 	output, done, err := ssh.Stream(cmd)
 	if err != nil {

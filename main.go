@@ -39,10 +39,22 @@ func main() {
 		Usage: "path to private ssh key",
 	}
 
+	doAccessKey := cli.StringFlag{
+		Name:   "doAccessKey",
+		Usage:  "DigitalOcean access key; useful for accessing buckets",
+		EnvVar: "DO_ACCESS_KEY",
+	}
+	doSecretAccessKey := cli.StringFlag{
+		Name:   "doAccessKey",
+		Usage:  "DigitalOcean SECRET access key; useful for accessing buckets",
+		EnvVar: "DO_SECRET_ACCESS_KEY",
+	}
+
 	app.Commands = []cli.Command{
 		cli.Command{
-			Name:  "apply-ssh",
-			Flags: []cli.Flag{confFlag, sshUser, sshPrivKeyPath},
+			Name: "apply-ssh",
+			Flags: []cli.Flag{confFlag, sshUser, sshPrivKeyPath, doAccessKey,
+				doSecretAccessKey},
 			Usage: "run an hpt config over ssh",
 			Action: func(ctx *cli.Context) error {
 				if !ctx.Args().Present() {
@@ -55,8 +67,9 @@ func main() {
 			},
 		},
 		cli.Command{
-			Name:  "manage",
-			Flags: []cli.Flag{confFlag, sshUser, sshPrivKeyPath},
+			Name: "manage",
+			Flags: []cli.Flag{confFlag, sshUser, sshPrivKeyPath, doAccessKey,
+				doSecretAccessKey},
 			Usage: "bring a box under management",
 			Action: func(ctx *cli.Context) error {
 				if !ctx.Args().Present() {

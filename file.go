@@ -24,12 +24,17 @@ type File struct {
 	Owner  string `toml:"owner"`
 	Group  string `toml:"group"`
 	// TODO(cm): expected sha or md5 hash
+	// TODO(cm): add overwrite?
 }
 
 // ApplyFile ...
 func ApplyFile(conf Config, f File) *ApplyState {
 	// state is our custom return type
 	state := NewApplyState("file")
+
+	if f.Path == "" {
+		return state.Error(errors.New("file block must have path attribute"))
+	}
 
 	// prerequisites on our File block configuration
 	if !filepath.IsAbs(f.Path) {
@@ -81,6 +86,9 @@ func createDir(conf Config, f File, state *ApplyState) *ApplyState {
 }
 
 func createFile(conf Config, f File, state *ApplyState) *ApplyState {
+	if f.Src == "" {
+		return state.Error(errors.New("file requires a source field"))
+	}
 	resolverName, path := ParseResolverPath(f.Src)
 	if resolverName == "" {
 		panic("local resolver unsupported")

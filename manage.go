@@ -107,7 +107,7 @@ func scpBinary(user, sshKey, targetIP string) error {
 		// Will need to configure this somehow from hpt.conf, I expect
 		HostKeyCallback: sshlib.InsecureIgnoreHostKey(),
 	}
-	fmt.Println("scp hpt binary to target...")
+	fmt.Println("scp hpt binary from this directory to target...")
 	// TODO cheating here. Lookup our own binary!
 	if err := ssh.Scp("hpt"); err != nil {
 		return errors.Wrap(err, "scp failed")
