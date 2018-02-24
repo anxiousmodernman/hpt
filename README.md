@@ -25,3 +25,8 @@ hpt is only tested on Centos-based machines for now, but since most management
 tasks are shelled-out calls to systemd and other linux utilities, adding support
 for other distros is feasible.
 
+## CurveTLS fork
+
+To work with gRPC, we've forked Rudd-O/curvetls, pending some private types being
+exported.
+
