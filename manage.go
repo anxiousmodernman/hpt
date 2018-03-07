@@ -143,5 +143,4 @@ func gobDecode(data []byte, v interface{}) error {
 	b := bytes.NewBuffer(data)
 	decoder := gob.NewDecoder(b)
 	return decoder.Decode(v)
-
 }

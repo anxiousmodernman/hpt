@@ -5,7 +5,9 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"net"
 	"os"
+	"strconv"
 
 	"github.com/fatih/color"
 	"github.com/urfave/cli"
@@ -48,6 +50,16 @@ func main() {
 		Usage:  "DigitalOcean SECRET access key; useful for accessing buckets",
 		EnvVar: "DO_SECRET_ACCESS_KEY",
 	}
+	keystorePath := cli.StringFlag{
+		Name:  "keystore",
+		Usage: "Path to keystore for a target's hpt instance",
+		Value: "/etc/hpt/keystore.db",
+	}
+	serverPort := cli.StringFlag{
+		Name:  "port",
+		Usage: "Port to listen on",
+		Value: "6632", // GGEZ
+	}
 
 	app.Commands = []cli.Command{
 		cli.Command{
@@ -67,6 +79,7 @@ func main() {
 			},
 		},
 		cli.Command{
+			// TODO deprecate
 			Name: "manage",
 			Flags: []cli.Flag{confFlag, sshUser, sshPrivKeyPath, doAccessKey,
 				doSecretAccessKey},
@@ -90,11 +103,34 @@ func main() {
 			},
 		},
 		cli.Command{
-			Name:  "serve",
-			Flags: []cli.Flag{confFlag},
+			Name: "serve",
+			// serve may be always up, or it may be a socket-activated service
+			Flags: []cli.Flag{keystorePath, serverPort},
 			Usage: "start an hpt daemon",
 			Action: func(ctx *cli.Context) error {
-				return nil
+				svr, err := NewHPTServer(ctx.String("keystore"))
+				if err != nil {
+					return err
+				}
+				var lis net.Listener
+				if os.Getenv("LISTEN_PID") == strconv.Itoa(os.Getpid()) {
+					// We're a systemd socket-activated service.
+					var err error
+					f := os.NewFile(3, hptsock)
+					lis, err = net.FileListener(f)
+					if err != nil {
+						return err
+					}
+				} else {
+					// We are a regular, long-running daemon service.
+					var err error
+					port := ctx.String("port")
+					lis, err = net.Listen("tcp", fmt.Sprintf("0.0.0.0:%s", port))
+					if err != nil {
+						return err
+					}
+				}
+				return svr.Serve(lis)
 			},
 		},
 	}
