@@ -51,9 +51,10 @@ func main() {
 		EnvVar: "DO_SECRET_ACCESS_KEY",
 	}
 	keystorePath := cli.StringFlag{
-		Name:  "keystore",
-		Usage: "Path to keystore for a target's hpt instance",
-		Value: "/etc/hpt/keystore.db",
+		Name:   "keystore",
+		Usage:  "Path to keystore for a target's hpt instance",
+		EnvVar: "HPT_KEYSTORE",
+		Value:  "/etc/hpt/keystore.db",
 	}
 	serverPort := cli.StringFlag{
 		Name:  "port",
