@@ -61,7 +61,6 @@ func Manage(target, sshUser, sshPrivKeyPath string) error {
 	if err := os.MkdirAll(keystoreDir, os.FileMode(0700)); err != nil {
 		return errors.Wrap(err, "error creating config dir")
 	}
-	fmt.Println("keystorePath:", keystorePath)
 
 	// generate a keypair
 	priv, pub, err := curvetls.GenKeyPair()
@@ -92,7 +91,6 @@ func Manage(target, sshUser, sshPrivKeyPath string) error {
 		return nil
 	})
 
-	fmt.Println("added keypair for", ip)
 	err = scpBinary(sshUser, sshPrivKeyPath, ip)
 
 	return err
