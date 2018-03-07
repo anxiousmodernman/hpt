@@ -52,6 +52,14 @@ the client to pick a keypair when connecting remotely during provisioning.
 hpt --target=foo --ip=1.2.3.4 provision_foo.toml
 ```
 
+The client's keystore path can be set with the env var `HPT_KEYSTORE` or the 
+`--keystore` flag.
+
+Print the known targets and their public keys.
+
+```
+HPT_KEYSTORE=~/.config/hpt/keystore.db hpt list-target-keys 
+```
 
 
 

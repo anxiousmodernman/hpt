@@ -4,6 +4,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net"
 	"os"
@@ -56,10 +57,19 @@ func main() {
 		EnvVar: "HPT_KEYSTORE",
 		Value:  "/etc/hpt/keystore.db",
 	}
+	keystoreOutputPath := cli.StringFlag{
+		Name:  "output",
+		Usage: "output path for generated keystores",
+		Value: "keystore.db",
+	}
 	serverPort := cli.StringFlag{
 		Name:  "port",
 		Usage: "Port to listen on",
 		Value: "6632", // GGEZ
+	}
+	targetName := cli.StringFlag{
+		Name:  "target",
+		Usage: "name of target; identifies target keypairs in our local keystore",
 	}
 
 	app.Commands = []cli.Command{
@@ -77,6 +87,39 @@ func main() {
 				user, key := ctx.String("user"), ctx.String("sshIdent")
 				err := ApplySSH(ctx.Args().First(), ctx.Args().Get(1), user, key)
 				return err
+			},
+		},
+		cli.Command{
+			Name:  "list-target-keys",
+			Flags: []cli.Flag{keystorePath, targetName},
+			Usage: "generate a boltdb keystore to be copied to a target server",
+			Action: func(ctx *cli.Context) error {
+				ks := ctx.String("keystore")
+				return ListTargetServerKeys(ks)
+
+			},
+		},
+		cli.Command{
+			Name:  "gen-target-keys",
+			Flags: []cli.Flag{keystorePath, targetName, keystoreOutputPath},
+			Usage: "print the named targets and their public keys",
+			Action: func(ctx *cli.Context) error {
+				t, ks := ctx.String("target"), ctx.String("keystore")
+				data, err := GenerateTargetServerKeys(t, ks)
+				if err != nil {
+					return err
+				}
+				out := ctx.String("output")
+				return ioutil.WriteFile(out, data, 0744)
+			},
+		},
+		cli.Command{
+			Name:  "gen-client-keys",
+			Flags: []cli.Flag{keystorePath},
+			Usage: "generate client keys for this instance; do this once; WARNING: invalidates target keystores",
+			Action: func(ctx *cli.Context) error {
+				ks := ctx.String("keystore")
+				return GenerateClientKeys(ks)
 			},
 		},
 		cli.Command{
@@ -109,7 +152,7 @@ func main() {
 			Flags: []cli.Flag{keystorePath, serverPort},
 			Usage: "start an hpt daemon",
 			Action: func(ctx *cli.Context) error {
-				svr, err := NewHPTServer(ctx.String("keystore"))
+				_, svr, err := NewHPTServer(ctx.String("keystore"))
 				if err != nil {
 					return err
 				}
@@ -123,6 +166,7 @@ func main() {
 						return err
 					}
 				} else {
+					fmt.Println("we want this listener")
 					// We are a regular, long-running daemon service.
 					var err error
 					port := ctx.String("port")
@@ -131,6 +175,13 @@ func main() {
 						return err
 					}
 				}
+				if svr == nil {
+					fmt.Println("svr is nil")
+				}
+				if lis == nil {
+					fmt.Println("lis is nil")
+				}
+
 				return svr.Serve(lis)
 			},
 		},
