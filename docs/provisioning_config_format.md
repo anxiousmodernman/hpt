@@ -1,15 +1,18 @@
 # Provisioning Config File
 
-Here we document the TOML format for files that provision servers. If executed
-on the server, hpt takes a config file as an argument.
+If executed on the server, hpt takes a provisioning config file as an argument.
 
 ```
 hpt example.toml
 ```
 
-The name **example.toml** is not important, only that it is a valid TOML file.
-The following configuration blocks can be configured.
+The name **example.toml** is not important, only that it is a valid TOML file
+containing valid hpt configuration stanzas, referred to as "blocks".
 
+Blocks hash to the top-level keys in TOML. In hpt's codebase, blocks map to the
+`Config` struct members.
+
+Blocks are evaulated and executed in the order they are defined in TOML.
 
 ## package
 
