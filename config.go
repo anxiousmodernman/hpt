@@ -19,7 +19,7 @@ type HostType struct {
 	// TODO(cm): support IP ranges here?
 }
 
-// Config is our container for passing any kind of applyable state.
+// Config defines our provisioner configuration.
 type Config struct {
 	InstallPackages []string          `toml:"packages"`
 	Secret          int               `toml:"secret"`
