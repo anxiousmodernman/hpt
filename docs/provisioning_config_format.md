@@ -89,7 +89,6 @@ The `[[group]]` block manages groups on a system.
 [[group]]
 name = "devs"
 gid = "1099"
-passwordless_sudo = true
 ```
 
 The following attributes are supported:
@@ -99,11 +98,12 @@ The following attributes are supported:
 **gid** - a GID for the group. If none is provided, the system will assign one. 
 A provided GID must not be in use.
 
-**passwordless_sudo** - if set, hpt will modify **/etc/sudoers** such that group
-members can use sudo without a password.
-
 **absent** - a boolean that indicates whether a group should be on the system.
 If true, hpt will attempt to remove the group. 
+
+**passwordless_sudo** - _deprecated_ - if set, hpt will modify **/etc/sudoers** 
+such that group members can use sudo without a password. 
+
 
 
 ## clone
