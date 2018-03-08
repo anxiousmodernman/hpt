@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io/ioutil"
 
-	"github.com/BurntSushi/toml"
 	"github.com/Rudd-O/curvetls"
 	"github.com/anxiousmodernman/hpt/proto/server"
 	"github.com/asdine/storm"
@@ -52,8 +51,7 @@ func NewHPTServer(path string) (*HPTServer, *grpc.Server, error) {
 // Apply ...
 func (h *HPTServer) Apply(conf *server.Config, stream server.HPT_ApplyServer) error {
 
-	var c Config
-	err := toml.Unmarshal(conf.Data, &c)
+	c, err := NewConfigFromBytes(conf.Data)
 	if err != nil {
 		return err
 	}
@@ -103,7 +101,7 @@ func (h *HPTServer) Plan(ctx context.Context, conf *server.Config) (*server.Plan
 }
 
 func whatHappened(state State) server.ApplyResultMetadata_Outcome {
-	var m map[State]server.ApplyResultMetadata_Outcome
+	var m = make(map[State]server.ApplyResultMetadata_Outcome)
 	m[Changed] = server.ApplyResultMetadata_CHANGED
 	m[Unchanged] = server.ApplyResultMetadata_UNCHANGED
 	return m[state]
