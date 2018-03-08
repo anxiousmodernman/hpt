@@ -2,3 +2,4 @@ hpt
 .vscode
 vendor/
 *.db
+*.png
