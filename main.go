@@ -173,7 +173,6 @@ func main() {
 						return err
 					}
 				} else {
-					fmt.Println("we want this listener")
 					// We are a regular, long-running daemon service.
 					var err error
 					port := ctx.String("port")
@@ -181,12 +180,6 @@ func main() {
 					if err != nil {
 						return err
 					}
-				}
-				if svr == nil {
-					fmt.Println("svr is nil")
-				}
-				if lis == nil {
-					fmt.Println("lis is nil")
 				}
 
 				return svr.Serve(lis)
@@ -233,18 +226,25 @@ func main() {
 		req := server.Config{data}
 		stream, err := c.Apply(context.TODO(), &req)
 		if err != nil {
-			fmt.Println("failed?", err)
 			return err
 		}
 		for {
 			msg, err := stream.Recv()
-			if err == io.EOF {
-				// normal termination
-				break
-			} else {
+			if err != nil {
+				if err == io.EOF {
+					// normal termination
+					break
+				}
 				return err
 			}
-			fmt.Println("got reply:", msg)
+
+			_ = msg
+			// switch msg.(type) {
+			// case *server.ApplyResult_Metadata:
+			// 	md, _ := msg.(*server.ApplyResult_Metadata)
+			// 	blue.Printf("Name: %s", md.Metadata.Name)
+			// 	blue.Printf("Outcome: %s", md.Metadata.Result.String())
+			// }
 		}
 
 		// send to server
@@ -295,10 +295,5 @@ func run(paths ...string) error {
 		printState(state)
 	}
 
-	return nil
-}
-
-// plan takes a sequence of paths to config files.
-func plan(paths ...string) error {
 	return nil
 }
