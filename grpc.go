@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io/ioutil"
+	"log"
 
 	"github.com/Rudd-O/curvetls"
 	"github.com/anxiousmodernman/hpt/proto/server"
@@ -14,9 +15,9 @@ import (
 
 var _ server.HPTServer = (*HPTServer)(nil)
 
-// HPTServer ...
-type HPTServer struct {
-}
+// HPTServer is our implementation of the generated server.HPTServer interface.
+// See the proto directory for the iterface definition in protobuf.
+type HPTServer struct{}
 
 // NewHPTServer is the constructor for our implementation of the generated gRPC
 // interface.
@@ -48,7 +49,7 @@ func NewHPTServer(path string) (*HPTServer, *grpc.Server, error) {
 	return &h, svr, nil
 }
 
-// Apply ...
+// Apply accepts a config and provisions a target.
 func (h *HPTServer) Apply(conf *server.Config, stream server.HPT_ApplyServer) error {
 
 	c, err := NewConfigFromBytes(conf.Data)
@@ -107,29 +108,29 @@ func whatHappened(state State) server.ApplyResultMetadata_Outcome {
 	return m[state]
 }
 
+// StormKeystore implements grpc.Crendentials.
 type StormKeystore struct {
 	DB *storm.DB
 }
 
+// Allowed is a method that implements a grpc.Credentials.
 func (sk *StormKeystore) Allowed(pubkey curvetls.Pubkey) bool {
 	var kp KeyPair
 	// pass the value we are querying for as the second param
-	fmt.Println("pubkey string", pubkey.String())
+	log.Println("client pubkey", pubkey.String())
 	err := sk.DB.One("Pub", pubkey.String(), &kp)
 	if err == nil {
 		return true
 	}
-	fmt.Println("KEYSTORE ERROR:", err)
+	log.Println("Keystore error:", err)
 	return false
 }
 
 // KeyPair is a database type that represents curvetls key pairs. A KeyPair
 // must be in the database for each pure grpc client that wants to connect.
-// Not used for grpc websocket clients.
 type KeyPair struct {
 	Name string `storm:"unique,id"`
-	// Pub and Priv are base64 strings that represent curvetls keys
-	// for servers or clients.
+	// Pub and Priv are base64 strings for curvetls
 	Pub  string
 	Priv string
 }
