@@ -16,8 +16,24 @@ Put `hpt` on the PATH and provide config(s) as arguments.
 sudo hpt config.toml
 ```
 
-The config will be applied, and the results of the apply will be printed to the
-console. If no changes were required, none will be applied.
+The TOML provisioner config will be applied, and the results of the apply will 
+be printed to the console. If no changes were required, none should be applied.
+
+## Usage: grpc (experimental)
+
+Create a target keystore per the instructions in **docs/architecture.md**, then
+run hpt as a server on the target machine.
+
+```
+hpt serve --keystore /path/to/keystore.db
+```
+
+From the client that generated the (named) target's keystore, provide both 
+`--target` and `--ip` to remotely connect and provision the target.
+
+```
+hpt --target=foo --ip=<ip addr> config.toml
+```
 
 ## Development status
 
@@ -27,6 +43,8 @@ for other distros is feasible.
 
 ## CurveTLS fork
 
-To work with gRPC, we've forked Rudd-O/curvetls, pending some private types being
-exported.
+To avoid the pain of generating x509 certs, we're using a somewhat experimental
+transport layer based on a fork of **Rudd-O/curvetls**. There are some 
+issues around [high CPU usage](#17), so regular TLS support will probably
+be added in the future.
 
