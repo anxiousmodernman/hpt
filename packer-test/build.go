@@ -1,4 +1,4 @@
-// This package is meant to be run with `go run test.go` to do a build/test.
+// This package is meant to be run with `go run build.go` to do a build/test.
 package main
 
 import (
