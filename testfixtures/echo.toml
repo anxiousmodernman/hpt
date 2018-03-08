@@ -1,0 +1,14 @@
+[[exec]]
+script = '''
+echo hello world
+'''
+
+[[exec]]
+script = '''
+echo hello world
+'''
+
+[[exec]]
+script = '''
+ls
+'''

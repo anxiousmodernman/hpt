@@ -10,6 +10,7 @@ import (
 	"log"
 	"net"
 	"os"
+	"reflect"
 	"strconv"
 
 	"github.com/anxiousmodernman/hpt/proto/server"
@@ -239,12 +240,19 @@ func main() {
 			}
 
 			_ = msg
-			// switch msg.(type) {
-			// case *server.ApplyResult_Metadata:
-			// 	md, _ := msg.(*server.ApplyResult_Metadata)
-			// 	blue.Printf("Name: %s", md.Metadata.Name)
-			// 	blue.Printf("Outcome: %s", md.Metadata.Result.String())
-			// }
+			switch msg.Msg.(type) {
+			case *server.ApplyResult_Metadata:
+
+				md, _ := msg.Msg.(*server.ApplyResult_Metadata)
+				blue.Printf("Name: %s\n", md.Metadata.Name)
+				blue.Printf("Outcome: %s\n", md.Metadata.Result.String())
+			case *server.ApplyResult_Output:
+				op, _ := msg.Msg.(*server.ApplyResult_Output)
+				blue.Printf("%s", string(op.Output.Output))
+			default:
+				red.Println("unknown message type")
+				red.Printf("%v", reflect.TypeOf(msg.Msg))
+			}
 		}
 
 		// send to server
@@ -263,6 +271,13 @@ var (
 	yellow  = color.New(color.FgYellow)
 	blue    = color.New(color.FgBlue)
 )
+
+func ifElseColor(b bool, t, f *color.Color) *color.Color {
+	if b {
+		return t
+	}
+	return f
+}
 
 // run takes a sequence of paths to config files.
 func run(paths ...string) error {
