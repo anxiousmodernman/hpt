@@ -13,6 +13,9 @@ import (
 	"reflect"
 	"strconv"
 
+	"net/http"
+	_ "net/http/pprof"
+
 	"github.com/anxiousmodernman/hpt/proto/server"
 	"github.com/fatih/color"
 	"github.com/urfave/cli"
@@ -26,6 +29,9 @@ var (
 )
 
 func main() {
+	go func() {
+		log.Println(http.ListenAndServe("0.0.0.0:6060", nil))
+	}()
 
 	app := cli.NewApp()
 	app.Version = Version
@@ -168,6 +174,26 @@ func main() {
 				}
 
 				return svr.Serve(lis)
+			},
+		},
+		cli.Command{
+			Name:  "unit-file",
+			Usage: "print an example systemd unit file to stdout",
+			Action: func(ctx *cli.Context) error {
+				u := `
+[Unit]
+Description=hpt
+
+[Service]
+ExecStart=/usr/bin/hpt --keystore /etc/hpt/keystore.db
+ExecReload=/bin/kill -HUP $MAINPID
+
+[Install]
+WantedBy=multi-user.target
+
+				`
+				fmt.Println(u)
+				return nil
 			},
 		},
 	}
