@@ -1,15 +1,18 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"flag"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"net"
 	"os"
 	"strconv"
 
+	"github.com/anxiousmodernman/hpt/proto/server"
 	"github.com/fatih/color"
 	"github.com/urfave/cli"
 )
@@ -70,6 +73,10 @@ func main() {
 	targetName := cli.StringFlag{
 		Name:  "target",
 		Usage: "name of target; identifies target keypairs in our local keystore",
+	}
+	targetIP := cli.StringFlag{
+		Name:  "ip",
+		Usage: "ip of target; must be paired with --target for remote execution",
 	}
 
 	app.Commands = []cli.Command{
@@ -170,7 +177,7 @@ func main() {
 					// We are a regular, long-running daemon service.
 					var err error
 					port := ctx.String("port")
-					lis, err = net.Listen("tcp", fmt.Sprintf("0.0.0.0:%s", port))
+					lis, err = net.Listen("tcp4", fmt.Sprintf("0.0.0.0:%s", port))
 					if err != nil {
 						return err
 					}
@@ -187,19 +194,61 @@ func main() {
 		},
 	}
 
+	// global flags
+	app.Flags = []cli.Flag{targetName, targetIP, serverPort, keystorePath}
+
 	// default action
 	app.Action = func(ctx *cli.Context) error {
 		args := ctx.Args()
 		if !args.Present() {
 			return errors.New("you must provide a state file")
 		}
-		if args.First() == "ssh-apply" {
-			fmt.Println("did you mean \"apply-ssh\"?")
-			os.Exit(1)
+		target := ctx.String("target")
+		ip := ctx.String("ip")
+		port := ctx.String("port")
+		ks := ctx.String("keystore")
+		if target == "" {
+			// no target specified, assuming local execution
+			var paths = []string{args.First()}
+			paths = append(paths, args.Tail()...)
+			return run(paths...)
 		}
+		if ip == "" {
+			return errors.New("if --target specified, must specify --ip, too")
+		}
+		addr := fmt.Sprintf("%s:%s", ip, port)
+		c, err := NewHPTClient(ks, target, addr)
+		if err != nil {
+			return err
+		}
+		// read config passed in
 		var paths = []string{args.First()}
 		paths = append(paths, args.Tail()...)
-		return run(paths...)
+		// only support single conf right now:
+		singleConf := paths[0]
+		data, err := ioutil.ReadFile(singleConf)
+		if err != nil {
+			return err
+		}
+		req := server.Config{data}
+		stream, err := c.Apply(context.TODO(), &req)
+		if err != nil {
+			fmt.Println("failed?", err)
+			return err
+		}
+		for {
+			msg, err := stream.Recv()
+			if err == io.EOF {
+				// normal termination
+				break
+			} else {
+				return err
+			}
+			fmt.Println("got reply:", msg)
+		}
+
+		// send to server
+		return nil
 	}
 
 	if err := app.Run(os.Args); err != nil {

@@ -116,9 +116,12 @@ type StormKeystore struct {
 func (sk *StormKeystore) Allowed(pubkey curvetls.Pubkey) bool {
 	var kp KeyPair
 	// pass the value we are querying for as the second param
-	if err := sk.DB.One("Pub", pubkey.String(), &kp); err == nil {
+	fmt.Println("pubkey string", pubkey.String())
+	err := sk.DB.One("Pub", pubkey.String(), &kp)
+	if err == nil {
 		return true
 	}
+	fmt.Println("KEYSTORE ERROR:", err)
 	return false
 }
 
@@ -175,6 +178,12 @@ func GenerateTargetServerKeys(targetName, localKeystorePath string) ([]byte, err
 		return nil, errors.Wrap(err,
 			fmt.Sprintf("error opening database at path: %s", localKeystorePath))
 	}
+	var clientKP KeyPair
+	err = db.One("Name", "client", &clientKP)
+	if err != nil {
+		return nil, err
+	}
+	clientKP.Priv = "" // very important that we do this
 
 	// TODO: We're overwriting targets by name right now. Probably want to
 	// warn instead.
@@ -187,11 +196,15 @@ func GenerateTargetServerKeys(targetName, localKeystorePath string) ([]byte, err
 	if err != nil {
 		return nil, err
 	}
+	f.Close()
 	outDB, err := storm.Open(f.Name())
 	if err != nil {
 		return nil, err
 	}
 	if err := outDB.Save(&serverKP); err != nil {
+		return nil, err
+	}
+	if err := outDB.Save(&clientKP); err != nil {
 		return nil, err
 	}
 	if err := outDB.Close(); err != nil {
