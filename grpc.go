@@ -5,6 +5,9 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"time"
+
+	"google.golang.org/grpc/keepalive"
 
 	"github.com/Rudd-O/curvetls"
 	"github.com/anxiousmodernman/hpt/proto/server"
@@ -43,7 +46,19 @@ func NewHPTServer(path string) (*HPTServer, *grpc.Server, error) {
 	}
 	creds := curvetls.NewGRPCServerCredentials(serverPub, serverPriv, keystore)
 
-	svr := grpc.NewServer(grpc.Creds(creds))
+	svr := grpc.NewServer(
+		grpc.Creds(creds),
+		grpc.KeepaliveParams(keepalive.ServerParameters{
+			Time:                  30 * time.Second,
+			Timeout:               10 * time.Second,
+			MaxConnectionAge:      30 * time.Second,
+			MaxConnectionAgeGrace: 30 * time.Second,
+			MaxConnectionIdle:     30 * time.Second,
+		}),
+		grpc.KeepaliveEnforcementPolicy(keepalive.EnforcementPolicy{
+			MinTime:             30 * time.Second,
+			PermitWithoutStream: true,
+		}))
 	var h HPTServer
 	server.RegisterHPTServer(svr, &h)
 	return &h, svr, nil
@@ -64,7 +79,9 @@ func (h *HPTServer) Apply(conf *server.Config, stream server.HPT_ApplyServer) er
 	for {
 		fn := ep.Next()
 		if fn == nil {
-			break
+			fmt.Println("done!")
+			stream.Context().Done()
+			return nil
 		}
 		state := fn()
 		outcome := whatHappened(state.Outcome)

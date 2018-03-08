@@ -17,6 +17,7 @@ import (
 	_ "net/http/pprof"
 
 	"github.com/anxiousmodernman/hpt/proto/server"
+	"github.com/bcicen/grmon"
 	"github.com/fatih/color"
 	"github.com/urfave/cli"
 )
@@ -29,10 +30,12 @@ var (
 )
 
 func main() {
-	go func() {
-		log.Println(http.ListenAndServe("0.0.0.0:6060", nil))
-	}()
-
+	if true {
+		go func() {
+			log.Println(http.ListenAndServe("0.0.0.0:6060", nil))
+		}()
+		grmon.Start()
+	}
 	app := cli.NewApp()
 	app.Version = Version
 

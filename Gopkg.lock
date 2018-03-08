@@ -27,6 +27,12 @@
   version = "v2.0.2"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/bcicen/grmon"
+  packages = ["."]
+  revision = "c4d4b500d709ad6a7afac094514452fa3e1b41e3"
+
+[[projects]]
   name = "github.com/boltdb/bolt"
   packages = ["."]
   revision = "2f1ce7a837dcb8da3ec595b1dac9d0632f0f99e8"
@@ -203,6 +209,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "7c732456733717931eff409e64b615d1452baf4d3805b6a821a6c318254b3cd2"
+  inputs-digest = "2c0fe1f1e9513cf44b7f718b9778e5d686a82f5d04237d397163571136b6f4d2"
   solver-name = "gps-cdcl"
   solver-version = 1
