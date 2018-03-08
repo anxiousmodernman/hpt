@@ -41,12 +41,10 @@ func NewHPTClient(keystorePath, targetName, targetAddr string) (server.HPTClient
 		return nil, err
 	}
 	creds := curvetls.NewGRPCClientCredentials(tpub, pub, priv)
-	//grpc.WithDialer
 	conn, err := grpc.Dial(targetAddr, grpc.WithTransportCredentials(creds))
 	if err != nil {
 		return nil, errors.Wrapf(err, "dialing %s", targetAddr)
 	}
-	st := conn.GetState()
 
 	return server.NewHPTClient(conn), nil
 }
