@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/asdine/storm"
 	"github.com/pkg/errors"
 	"google.golang.org/grpc"
@@ -10,9 +8,6 @@ import (
 	"github.com/Rudd-O/curvetls"
 	"github.com/anxiousmodernman/hpt/proto/server"
 )
-
-type HPTClient struct {
-}
 
 // NewHPTClient returns our client that can connect to remote targets over gRPC.
 func NewHPTClient(keystorePath, targetName, targetAddr string) (server.HPTClient, error) {
@@ -45,7 +40,6 @@ func NewHPTClient(keystorePath, targetName, targetAddr string) (server.HPTClient
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println("about to dial")
 	creds := curvetls.NewGRPCClientCredentials(tpub, pub, priv)
 	//grpc.WithDialer
 	conn, err := grpc.Dial(targetAddr, grpc.WithTransportCredentials(creds))
@@ -53,7 +47,6 @@ func NewHPTClient(keystorePath, targetName, targetAddr string) (server.HPTClient
 		return nil, errors.Wrapf(err, "dialing %s", targetAddr)
 	}
 	st := conn.GetState()
-	fmt.Println("conn state", st)
 
 	return server.NewHPTClient(conn), nil
 }
