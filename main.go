@@ -82,22 +82,6 @@ func main() {
 
 	app.Commands = []cli.Command{
 		cli.Command{
-			// TODO deprecate in favor of grpc
-			Name: "apply-ssh",
-			Flags: []cli.Flag{confFlag, sshUser, sshPrivKeyPath, doAccessKey,
-				doSecretAccessKey},
-			Usage: "run an hpt config over ssh",
-			Action: func(ctx *cli.Context) error {
-				if !ctx.Args().Present() {
-					fmt.Println("you must provide an hpt config")
-					os.Exit(1)
-				}
-				user, key := ctx.String("user"), ctx.String("sshIdent")
-				err := ApplySSH(ctx.Args().First(), ctx.Args().Get(1), user, key)
-				return err
-			},
-		},
-		cli.Command{
 			Name:  "list-target-keys",
 			Flags: []cli.Flag{keystorePath, targetName},
 			Usage: "generate a boltdb keystore to be copied to a target server",
