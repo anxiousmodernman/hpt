@@ -7,20 +7,24 @@ passed a provisioning config, either directly at the command line or over gRPC.
 
 ## gRPC
 
-To provision targets remotely, we use gRPC. This communication channel must be
-encrypted, s to accomplish that we use (our fork of) curvetls, a simple 
-library that encrypts tcp transports, and uses asymmetric public-key encryption.
+To provision targets remotely, we use gRPC. This communication channel is 
+encrypted with (a fork of) curvetls, a simple library that encrypts tcp 
+transports with asymmetric public-key encryption.
 
-During remote provisioning the machine where `hpt` is invoked is the client,
-and the target machine's instance running `hpt serve` is the server. Both must
-authenticate each other with the other's public key. A server will only accept 
-connections from clients whose public key is in its keystore. A client will
-only connect to targets if it knows the target/server's public key. This raises
-the practical problem of delivering a keystore to the target before it can be
-provisioned.
+During remote provisioning the machine where `hpt` is invoked is the **client**,
+and the **target** machine's instance running `hpt serve` is the server, waiting
+for connections. Both must authenticate each other with the other's public key. 
+A server will only accept connections from clients whose public key is in its 
+keystore. A client will only connect to targets if it knows the target/server's 
+public key. This raises the practical problem of delivering a keystore to the 
+target before it can be provisioned.
 
 The client also has a keystore. This is a database of 1) it's own keypair and
-2) all the known target keypairs, identified by their unique name. 
+2) all the known target keypairs, identified by their unique name. Passing 
+`--target foo` at the command line will select a keypair from the database by
+that name. Given that `--target` and `--ip` are fundamentally decoupled, it is
+possible to easy reuse a target keystore on many hosts. This is suitable for 
+testing, but really you should create unique keys for every host you provision.
 
 ### Generating a Keystore for a Target
 
