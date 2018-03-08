@@ -92,6 +92,7 @@ func (h *HPTServer) Apply(conf *server.Config, stream server.HPT_ApplyServer) er
 		if err := stream.Send(&data); err != nil {
 			return err
 		}
+
 	}
 	return nil
 }

@@ -254,9 +254,7 @@ func main() {
 				red.Printf("%v", reflect.TypeOf(msg.Msg))
 			}
 		}
-
-		// send to server
-		return nil
+		return stream.CloseSend()
 	}
 
 	if err := app.Run(os.Args); err != nil {
