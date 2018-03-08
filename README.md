@@ -10,6 +10,8 @@ This project is aiming to be a simple and general provisioning tool for modern
 linux servers. Ultimately we want hpt to do the kinds of things that Ansible and
 SaltStack do, but with TOML config and the joy of Go.
 
+For information on our TOML-based provisioning DSL, see [these docs](docs/provisioning_config_format.md).
+
 ## Usage: on the host 
 
 Put `hpt` on the PATH and provide config(s) as arguments.
