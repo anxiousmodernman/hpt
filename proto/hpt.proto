@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+option go_package = "github.com/anxiousmodernman/hpt/proto/server";
+
+service HPT {
+    rpc Apply(Config) returns (stream ApplyResult) {}
+    rpc Plan(Config) returns (PlanResult) {}
+}
+
+// ApplyResult is one of: metadata about an applied result or a stream of bytes
+// of the output.
+message ApplyResult {
+    oneof msg {
+        ApplyResultMetadata metadata = 1;
+        ApplyResultOutput output = 2;
+    }
+}
+
+// The result of one config item's apply, not the whole config file.
+message ApplyResultMetadata {
+    // Process exit code, if any.
+    int32 exit_code = 1;
+    enum Outcome {
+       UNKNOWN = 0;
+       CHANGED = 1;
+       UNCHANGED = 2;
+    }
+    // what happened for the , if anything
+    Outcome result = 2;
+    // some description/path to the specific toml item executed
+    string name = 3;
+}
+
+message ApplyResultOutput {
+
+    // raw bytes of the output
+    bytes output = 1;
+    // where the output comes from
+    enum OutputType {
+      OTHER = 0;
+      STDOUT = 1;
+      STDERR = 2;
+      COMBINED = 3;
+    }
+}
+
+// A TOML config
+message Config {
+   bytes data = 1;
+}
+
+// An outcome of a Plan
+message PlanResult{}

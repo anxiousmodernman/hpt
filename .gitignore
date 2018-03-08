@@ -1,3 +1,4 @@
 hpt
 .vscode
 vendor/
+*.db

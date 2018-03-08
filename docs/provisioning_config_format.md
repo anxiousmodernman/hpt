@@ -1,15 +1,18 @@
 # Provisioning Config File
 
-Here we document the TOML format for files that provision servers. If executed
-on the server, hpt takes a config file as an argument.
+If executed on the server, hpt takes a provisioning config file as an argument.
 
 ```
 hpt example.toml
 ```
 
-The name **example.toml** is not important, only that it is a valid TOML file.
-The following configuration blocks can be configured.
+The name **example.toml** is not important, only that it is a valid TOML file
+containing valid hpt configuration stanzas, referred to as "blocks".
 
+Blocks hash to the top-level keys in TOML. In hpt's codebase, blocks map to the
+`Config` struct members.
+
+Blocks are evaulated and executed in the order they are defined in TOML.
 
 ## package
 
@@ -86,7 +89,6 @@ The `[[group]]` block manages groups on a system.
 [[group]]
 name = "devs"
 gid = "1099"
-passwordless_sudo = true
 ```
 
 The following attributes are supported:
@@ -96,11 +98,12 @@ The following attributes are supported:
 **gid** - a GID for the group. If none is provided, the system will assign one. 
 A provided GID must not be in use.
 
-**passwordless_sudo** - if set, hpt will modify **/etc/sudoers** such that group
-members can use sudo without a password.
-
 **absent** - a boolean that indicates whether a group should be on the system.
 If true, hpt will attempt to remove the group. 
+
+**passwordless_sudo** - _deprecated_ - if set, hpt will modify **/etc/sudoers** 
+such that group members can use sudo without a password. 
+
 
 
 ## clone

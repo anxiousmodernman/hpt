@@ -19,7 +19,7 @@ type HostType struct {
 	// TODO(cm): support IP ranges here?
 }
 
-// Config is our container for passing any kind of applyable state.
+// Config defines our provisioner configuration.
 type Config struct {
 	InstallPackages []string          `toml:"packages"`
 	Secret          int               `toml:"secret"`
@@ -59,6 +59,17 @@ func NewConfig(path string) (Config, error) {
 		return c, err
 	}
 	c.keys = md.Keys()
+	return c, nil
+}
 
+// NewConfigFromBytes lets us deserialize a config from a []byte, which is how
+// we will receive configs over gRPC.
+func NewConfigFromBytes(data []byte) (Config, error) {
+	var c Config
+	md, err := toml.Decode(string(data), &c)
+	if err != nil {
+		return c, err
+	}
+	c.keys = md.Keys()
 	return c, nil
 }
