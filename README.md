@@ -1,6 +1,8 @@
 # hpt
 
-A host provisioning tool.
+A host provisioning tool. 
+
+_Note: an experimental work in progress_
 
 ## Overview
 
@@ -19,7 +21,7 @@ sudo hpt config.toml
 The TOML provisioner config will be applied, and the results of the apply will 
 be printed to the console. If no changes were required, none should be applied.
 
-## Usage: grpc (experimental)
+## Usage: grpc 
 
 Create a target keystore per the instructions in **docs/architecture.md**, then
 run hpt as a server on the target machine.
