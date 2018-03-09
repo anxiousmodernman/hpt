@@ -8,17 +8,11 @@
   version = "v0.3.0"
 
 [[projects]]
-  branch = "grpc_credentials"
+  branch = "master"
   name = "github.com/Rudd-O/curvetls"
   packages = ["."]
-  revision = "c28a1e3ee744ad096dc7b06b8f19be7541ee8f82"
+  revision = "80774c28b68970d18808f95e8cef759afc06367a"
   source = "github.com/anxiousmodernman/curvetls"
-
-[[projects]]
-  branch = "master"
-  name = "github.com/anxiousmodernman/easyssh"
-  packages = ["."]
-  revision = "29882595f380aec66d4e16b2efbef85fa956de59"
 
 [[projects]]
   name = "github.com/asdine/storm"
@@ -33,22 +27,10 @@
   revision = "c4d4b500d709ad6a7afac094514452fa3e1b41e3"
 
 [[projects]]
-  name = "github.com/boltdb/bolt"
-  packages = ["."]
-  revision = "2f1ce7a837dcb8da3ec595b1dac9d0632f0f99e8"
-  version = "v1.3.1"
-
-[[projects]]
   name = "github.com/coreos/bbolt"
   packages = ["."]
   revision = "583e8937c61f1af6513608ccc75c97b6abdf4ff9"
   version = "v1.3.0"
-
-[[projects]]
-  name = "github.com/digitalocean/godo"
-  packages = [".","context"]
-  revision = "77ea48de76a7b31b234d854f15d003c68bb2fb90"
-  version = "v1.1.1"
 
 [[projects]]
   branch = "master"
@@ -73,12 +55,6 @@
   name = "github.com/golang/protobuf"
   packages = ["proto","ptypes","ptypes/any","ptypes/duration","ptypes/timestamp"]
   revision = "1643683e1b54a9e88ad26d98f81400c8c9d9f4f9"
-
-[[projects]]
-  branch = "master"
-  name = "github.com/google/go-querystring"
-  packages = ["query"]
-  revision = "53e6ce116135b80d037921a7fdd5138cf32d7a8a"
 
 [[projects]]
   name = "github.com/mattn/go-colorable"
@@ -135,12 +111,6 @@
   version = "v1.3.0"
 
 [[projects]]
-  branch = "master"
-  name = "github.com/tent/http-link-go"
-  packages = ["."]
-  revision = "ac974c61c2f990f4115b119354b5e0b47550e888"
-
-[[projects]]
   name = "github.com/urfave/cli"
   packages = ["."]
   revision = "cfb38830724cc34fedffe9a2a29fb54fa9169cd1"
@@ -155,14 +125,8 @@
 [[projects]]
   branch = "master"
   name = "golang.org/x/net"
-  packages = ["context","context/ctxhttp","http2","http2/hpack","idna","internal/timeseries","lex/httplex","trace"]
+  packages = ["context","http2","http2/hpack","idna","internal/timeseries","lex/httplex","trace"]
   revision = "4b14673ba32bee7f5ac0f990a48f033919fd418b"
-
-[[projects]]
-  branch = "master"
-  name = "golang.org/x/oauth2"
-  packages = [".","internal"]
-  revision = "bb50c06baba3d0c76f9d125c0719093e315b5b44"
 
 [[projects]]
   branch = "master"
@@ -175,12 +139,6 @@
   packages = ["collate","collate/build","internal/colltab","internal/gen","internal/tag","internal/triegen","internal/ucd","language","secure/bidirule","transform","unicode/bidi","unicode/cldr","unicode/norm","unicode/rangetable"]
   revision = "f21a4dfb5e38f5895301dc265a8def02365cc3d0"
   version = "v0.3.0"
-
-[[projects]]
-  name = "google.golang.org/appengine"
-  packages = ["internal","internal/base","internal/datastore","internal/log","internal/remote_api","internal/urlfetch","urlfetch"]
-  revision = "150dc57a1b433e64154302bdc40b6bb8aefa313a"
-  version = "v1.0.0"
 
 [[projects]]
   branch = "master"
@@ -209,6 +167,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "2c0fe1f1e9513cf44b7f718b9778e5d686a82f5d04237d397163571136b6f4d2"
+  inputs-digest = "ff72572427c604eff3d9d8b18621cd0c253ce34540a467144db70dc1012025a2"
   solver-name = "gps-cdcl"
   solver-version = 1

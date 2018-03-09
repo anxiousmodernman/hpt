@@ -23,7 +23,7 @@ The client also has a keystore. This is a database of 1) it's own keypair and
 2) all the known target keypairs, identified by their unique name. Passing 
 `--target foo` at the command line will select a keypair from the database by
 that name. Given that `--target` and `--ip` are fundamentally decoupled, it is
-possible to easy reuse a target keystore on many hosts. This is suitable for 
+possible to easily reuse a target keystore on many hosts. This is suitable for 
 testing, but really you should create unique keys for every host you provision.
 
 ### Generating a Keystore for a Target

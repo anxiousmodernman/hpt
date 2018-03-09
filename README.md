@@ -1,5 +1,7 @@
 # hpt
 
+[![Build Status](https://travis-ci.org/anxiousmodernman/hpt.svg?branch=master)](https://travis-ci.org/anxiousmodernman/hpt)
+
 A host provisioning tool. 
 
 _Note: an experimental work in progress_

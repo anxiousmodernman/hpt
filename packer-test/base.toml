@@ -1,35 +1,22 @@
 
-#packages = ["epel-release", "git", "gcc", "libevent-devel", 
-#            "automake", "ncurses-devel", "wget", "cmake", "gcc-c++",
-#            "libtool", "unzip"]
-
 packages = ["git", "wget"]
 
-[bucket.bkt]
-url = "nyc3.digitaloceanspaces.com"
-name = "coleman"
+# Rework this DSL.
+# [bucket.bkt]
+# url = "nyc3.digitaloceanspaces.com"
+# name = "coleman"
 
-[[group]]
-name = "wheel"
-passwordless_sudo = true
+# [[file]]
+# path = "/home/coleman/.ssh/hackbox"
+# source = "bkt://ssh-keys/hackbox"
+# perms = 600
+# owner = "coleman"
+# group = "coleman"
 
-[[user]]
-name = "coleman"
-home = "/home/coleman"
-groups = ["wheel"]  # if groups don't exist, give better feedback
-ssh_public_key = "bkt://ssh-keys/hackbox.pub"
-
-[[service]]
-name = "sshd"
-status = "restarted"
 
 [[clone]]
-URL = "https://github.com/tmux/tmux.git"
-dest = "/opt/tmux"
-#
-[[clone]]
-URL = "https://github.com/neovim/neovim.git"
-dest = "/opt/neovim"
+URL = "https://github.com/anxiousmodernman/hpt.git"
+dest = "/opt/hpt"
 
 # install go 
 [[exec]]
@@ -39,15 +26,8 @@ wget https://storage.googleapis.com/golang/go1.9.1.linux-amd64.tar.gz
 tar -C /usr/local -xzf go1.9.1.linux-amd64.tar.gz
 '''
 
-# building neovim
+# test hpt
 [[exec]]
-script = "make CMAKE_BUILD_TYPE=RelWithDebInfo"
-dir = "/opt/neovim"
+script = "/usr/local/go/bin/go test ./..."
+dir = "/opt/hpt"
 
-# installing tmux
-[[exec]]
-script = """
-sh autoconf.sh
-./configure && make
-"""
-dir = "/opt/tmux"
