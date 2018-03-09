@@ -12,6 +12,7 @@ import (
 	"os"
 	"reflect"
 	"strconv"
+	"strings"
 
 	"net/http"
 	_ "net/http/pprof"
@@ -30,39 +31,21 @@ var (
 )
 
 func main() {
-	if true {
+
+	// For profiling, set HPT_PROFILE=true
+	if truthy(os.Getenv("HPT_PROFILE")) {
 		go func() {
 			log.Println(http.ListenAndServe("0.0.0.0:6060", nil))
 		}()
 		grmon.Start()
 	}
+
 	app := cli.NewApp()
 	app.Version = Version
 
 	confFlag := cli.StringFlag{
 		Name:  "conf",
 		Usage: "path to config",
-	}
-
-	sshUser := cli.StringFlag{
-		Name:  "user",
-		Usage: "ssh user to connect as",
-	}
-
-	sshPrivKeyPath := cli.StringFlag{
-		Name:  "sshIdent",
-		Usage: "path to private ssh key",
-	}
-
-	doAccessKey := cli.StringFlag{
-		Name:   "doAccessKey",
-		Usage:  "DigitalOcean access key; useful for accessing buckets",
-		EnvVar: "DO_ACCESS_KEY",
-	}
-	doSecretAccessKey := cli.StringFlag{
-		Name:   "doAccessKey",
-		Usage:  "DigitalOcean SECRET access key; useful for accessing buckets",
-		EnvVar: "DO_SECRET_ACCESS_KEY",
 	}
 	keystorePath := cli.StringFlag{
 		Name:   "keystore",
@@ -124,22 +107,6 @@ func main() {
 			},
 		},
 		cli.Command{
-			// TODO deprecate
-			Name: "manage",
-			Flags: []cli.Flag{confFlag, sshUser, sshPrivKeyPath, doAccessKey,
-				doSecretAccessKey},
-			Usage: "bring a box under management",
-			Action: func(ctx *cli.Context) error {
-				if !ctx.Args().Present() {
-					fmt.Println("you must provide an IP to manage")
-					os.Exit(1)
-				}
-				user, key := ctx.String("user"), ctx.String("sshIdent")
-				err := Manage(ctx.Args().First(), user, key)
-				return err
-			},
-		},
-		cli.Command{
 			Name:  "plan",
 			Flags: []cli.Flag{confFlag},
 			Action: func(ctx *cli.Context) error {
@@ -190,6 +157,7 @@ Description=hpt
 [Service]
 ExecStart=/usr/bin/hpt --keystore /etc/hpt/keystore.db
 ExecReload=/bin/kill -HUP $MAINPID
+CPUShare=10%
 
 [Install]
 WantedBy=multi-user.target
@@ -218,7 +186,7 @@ WantedBy=multi-user.target
 			// no target specified, assuming local execution
 			var paths = []string{args.First()}
 			paths = append(paths, args.Tail()...)
-			return run(paths...)
+			return runLocal(paths...)
 		}
 		if ip == "" {
 			return errors.New("if --target specified, must specify --ip, too")
@@ -237,7 +205,7 @@ WantedBy=multi-user.target
 		if err != nil {
 			return err
 		}
-		req := server.Config{data}
+		req := server.Config{Data: data}
 		stream, err := c.Apply(context.TODO(), &req)
 		if err != nil {
 			return err
@@ -290,8 +258,8 @@ func ifElseColor(b bool, t, f *color.Color) *color.Color {
 	return f
 }
 
-// run takes a sequence of paths to config files.
-func run(paths ...string) error {
+// runLocal takes a sequence of paths to config files and executes them.
+func runLocal(paths ...string) error {
 
 	// TODO support multiple configs
 	path := paths[0]
@@ -322,4 +290,13 @@ func run(paths ...string) error {
 	}
 
 	return nil
+}
+
+func truthy(s string) bool {
+	for _, x := range []string{"true", "t", "1", "yes", "y"} {
+		if strings.TrimSpace(s) == x {
+			return true
+		}
+	}
+	return false
 }
