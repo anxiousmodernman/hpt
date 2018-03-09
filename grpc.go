@@ -111,7 +111,6 @@ func (h *HPTServer) Apply(conf *server.Config, stream server.HPT_ApplyServer) er
 		}
 
 	}
-	return nil
 }
 
 // Plan ...
