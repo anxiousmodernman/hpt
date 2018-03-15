@@ -21,7 +21,7 @@
             "execute_command": "echo {{user `ssh_username`}} | {{ .Vars }} sudo -E -S sh '{{ .Path }}'",
             "inline": [
                 "mkdir -p /home/tester/go/bin",
-                "mkdir -p /home/tester/go/src/github.com/anxiousmodernman/hpt",
+                "mkdir -p /home/tester/go/src/github.com/anxiousmodernman/hpt/vendor",
                 "yum install -y git wget unzip",
                 "git clone https://github.com/anxiousmodernman/hpt /home/tester/go/src/github.com/anxiousmodernman/hpt",
                 "unzip packer_1.2.1_linux_amd64.zip",
