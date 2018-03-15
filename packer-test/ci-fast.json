@@ -1,0 +1,34 @@
+{
+    "variables": {
+        "do_api_token": "{{ env `DIGITALOCEAN_API_TOKEN` }}",
+        "hpt_config": "base.toml",
+        "region": "sfo2",
+        "local_repo": "/home/tester/go/src/github.com/anxiousmodernman/hpt",
+        "user_dir": "/home/tester/go/src/github.com/anxiousmodernman",
+        "base_image": "32614776"
+    },
+    "builders": [
+        {
+            "type": "digitalocean",
+            "image": "{{ user `base_image` }}",
+            "snapshot_name": "hpt-test-{{ timestamp }}",
+            "region": "{{ user `region` }}",
+            "size": "512mb",
+            "ssh_username": "root",
+            "api_token": "{{ user `do_api_token` }}"
+        }
+    ],
+    "provisioners": [
+        {
+            "type": "shell",
+            "execute_command": "echo {{user `ssh_username`}} | {{ .Vars }} sudo -E -S sh '{{ .Path }}'",
+            "inline": [
+                "cd {{ user `local_repo` }}",
+                "export GOPATH=/home/tester/go",
+                "export PATH=$PATH:/home/tester/go/bin",
+                "dep ensure",
+                "go test ./..."
+            ]
+        }
+    ]
+}
