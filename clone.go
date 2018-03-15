@@ -20,14 +20,14 @@ type Clone struct {
 func ApplyClone(conf Config, repo Clone) *ApplyState {
 	state := NewApplyState("clone")
 
-	r, err := git.NewFilesystemRepository(repo.Dest)
-	if err != nil {
-		return state.Errorf("error creating repo: %v", err)
-	}
-	err = r.Clone(&git.CloneOptions{
-		URL:          repo.URL,
-		SingleBranch: true,
+	r, err := git.PlainClone(repo.Dest, false, &git.CloneOptions{
+		URL:               repo.URL,
+		RecurseSubmodules: git.DefaultSubmoduleRecursionDepth,
+		SingleBranch:      true,
 	})
+	// TODO: explore new api
+	_, _ = r.Head()
+
 	if err != nil {
 		return state.Errorf("error cloning repo: %v", err)
 	}

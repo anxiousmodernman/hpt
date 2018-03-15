@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 local_repo=/home/tester/go/src/github.com/anxiousmodernman/hpt
 user_dir=/home/tester/go/src/github.com/anxiousmodernman
 
@@ -20,7 +22,7 @@ cd /tmp
 mkdir protobuf
 wget --progress=dot:mega https://github.com/golang/dep/releases/download/v0.4.1/dep-linux-amd64
 chmod +x dep-linux-amd64
-mv dep-linux-amd64 /home/tester/go/bin/dep
+mv dep-linux-amd64 /usr/bin/dep #/home/tester/go/bin/dep
 wget https://coleman.nyc3.digitaloceanspaces.com/software/protoc-gen-go/protoc-gen-go
 chmod +x protoc-gen-go
 mv protoc-gen-go /bin
@@ -33,6 +35,10 @@ cd $local_repo
 ls
 #echo HACK: remove lockfile
 #rm Gopkg.lock
-dep ensure
+echo "TRY MAKING VENDOR MANUALLY"
+mkdir vendor
+dep ensure -update
+echo "AGAIN WHAT IS HERE: $(ls)"
+echo "AGAIN WHAT IS VENDOR: $(ls vendor)"
 ./gen.sh
 go build
