@@ -3,7 +3,9 @@ go:
     - 1.9
 
 install:
-    - sudo apt install packer
+    - wget https://releases.hashicorp.com/packer/1.2.1/packer_1.2.1_linux_amd64.zip
+    - unzip packer_1.2.1_linux_amd64.zip 
+    - sudo mv packer /usr/bin
     - go get -u github.com/golang/dep/cmd/dep
     - cd ..
     - cd /tmp 
