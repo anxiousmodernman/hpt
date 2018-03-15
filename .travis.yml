@@ -3,6 +3,7 @@ go:
     - 1.9
 
 install:
+    - sudo apt install packer
     - go get -u github.com/golang/dep/cmd/dep
     - cd ..
     - cd /tmp 
