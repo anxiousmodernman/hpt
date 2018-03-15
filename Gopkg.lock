@@ -30,8 +30,8 @@
     "internal",
     "q"
   ]
-  revision = "68fc73b635f890fe7ba2f3b15ce80c85b28a744f"
-  version = "v2.0.2"
+  revision = "a86fa5e09c9c50a06416b08fd9acd4839fb2d62e"
+  version = "v2.1.0"
 
 [[projects]]
   branch = "master"
@@ -58,22 +58,34 @@
   branch = "master"
   name = "github.com/dustin/go-humanize"
   packages = ["."]
-  revision = "77ed807830b4df581417e7f89eb81d4872832b72"
+  revision = "bb3d318650d48840a39aa21a027c6630e198e626"
+
+[[projects]]
+  name = "github.com/emirpasic/gods"
+  packages = [
+    "containers",
+    "lists",
+    "lists/arraylist",
+    "trees",
+    "trees/binaryheap",
+    "utils"
+  ]
+  revision = "f6c17b524822278a87e3b3bd809fec33b51f5b46"
+  version = "v1.9.0"
 
 [[projects]]
   name = "github.com/fatih/color"
   packages = ["."]
-  revision = "570b54cabe6b8eb0bc2dfce68d964677d63b5260"
-  version = "v1.5.0"
+  revision = "507f6050b8568533fb3f5504de8e5205fa62a114"
+  version = "v1.6.0"
 
 [[projects]]
   name = "github.com/go-ini/ini"
   packages = ["."]
-  revision = "f280b3ba517bf5fc98922624f21fb0e7a92adaec"
-  version = "v1.30.3"
+  revision = "6333e38ac20b8949a8dd68baa3650f4dee8f39f0"
+  version = "v1.33.0"
 
 [[projects]]
-  branch = "master"
   name = "github.com/golang/protobuf"
   packages = [
     "proto",
@@ -82,13 +94,26 @@
     "ptypes/duration",
     "ptypes/timestamp"
   ]
-  revision = "1643683e1b54a9e88ad26d98f81400c8c9d9f4f9"
+  revision = "925541529c1fa6821df4e44ce2723319eb2be768"
+  version = "v1.0.0"
 
 [[projects]]
   branch = "master"
   name = "github.com/google/go-querystring"
   packages = ["query"]
   revision = "53e6ce116135b80d037921a7fdd5138cf32d7a8a"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/jbenet/go-context"
+  packages = ["io"]
+  revision = "d14ea06fba99483203c19d92cfcd13ebe73135f4"
+
+[[projects]]
+  name = "github.com/kevinburke/ssh_config"
+  packages = ["."]
+  revision = "0ff8514904a8ebfcfb3c32ad73e1f8498a7f81b4"
+  version = "0.3"
 
 [[projects]]
   name = "github.com/mattn/go-colorable"
@@ -106,7 +131,7 @@
   branch = "master"
   name = "github.com/minio/go-homedir"
   packages = ["."]
-  revision = "21304a94172ae3a09dee2cd86a12fb6f842138c7"
+  revision = "4d76aabb80b22bad8695d3904e943f1fb5e6199f"
 
 [[projects]]
   name = "github.com/minio/minio-go"
@@ -123,10 +148,22 @@
   version = "3.0.3"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/mitchellh/go-homedir"
+  packages = ["."]
+  revision = "b8bc1bf767474819792c23f32d8286a45736f1c6"
+
+[[projects]]
   name = "github.com/pborman/uuid"
   packages = ["."]
   revision = "e790cca94e6cc75c7064b1332e63811d4aae1a53"
   version = "v1.1"
+
+[[projects]]
+  name = "github.com/pelletier/go-buffruneio"
+  packages = ["."]
+  revision = "c37440a7cf42ac63b919c752ca73a85067e05992"
+  version = "v0.2.0"
 
 [[projects]]
   name = "github.com/pkg/errors"
@@ -135,16 +172,16 @@
   version = "v0.8.0"
 
 [[projects]]
-  branch = "master"
   name = "github.com/sergi/go-diff"
   packages = ["diffmatchpatch"]
-  revision = "feef008d51ad2b3778f85d387ccf91735543008d"
+  revision = "1744e2970ca51c86172c8190fadad617561ed6e7"
+  version = "v1.0.0"
 
 [[projects]]
   name = "github.com/sirupsen/logrus"
   packages = ["."]
-  revision = "f006c2ac4710855cf0f916dd6b77acf6b048dc6e"
-  version = "v1.0.3"
+  revision = "c155da19408a8799da419ed3eeb0cb5db0ad5dbc"
+  version = "v1.0.5"
 
 [[projects]]
   name = "github.com/src-d/gcfg"
@@ -171,20 +208,35 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/xanzy/ssh-agent"
+  packages = ["."]
+  revision = "ba9c9e33906f58169366275e3450db66139a31a9"
+
+[[projects]]
+  branch = "master"
   name = "golang.org/x/crypto"
   packages = [
+    "cast5",
     "curve25519",
     "ed25519",
     "ed25519/internal/edwards25519",
+    "internal/chacha20",
     "nacl/box",
     "nacl/secretbox",
+    "openpgp",
+    "openpgp/armor",
+    "openpgp/elgamal",
+    "openpgp/errors",
+    "openpgp/packet",
+    "openpgp/s2k",
     "poly1305",
     "salsa20/salsa",
     "ssh",
     "ssh/agent",
+    "ssh/knownhosts",
     "ssh/terminal"
   ]
-  revision = "2509b142fb2b797aa7587dad548f113b2c0f20ce"
+  revision = "b4956d363a8b14623cc81db401707679605930a3"
 
 [[projects]]
   branch = "master"
@@ -199,7 +251,7 @@
     "lex/httplex",
     "trace"
   ]
-  revision = "4b14673ba32bee7f5ac0f990a48f033919fd418b"
+  revision = "e0c57d8f86c17f0724497efcb3bc617e82834821"
 
 [[projects]]
   branch = "master"
@@ -217,7 +269,7 @@
     "unix",
     "windows"
   ]
-  revision = "164713f0dfcec4e80be8b53e1f0811f5f0d84578"
+  revision = "cc7307a45468e49eaf2997c890f14aa03a26917b"
 
 [[projects]]
   name = "golang.org/x/text"
@@ -258,7 +310,7 @@
   branch = "master"
   name = "google.golang.org/genproto"
   packages = ["googleapis/rpc/status"]
-  revision = "2b5a72b8730b0b16380010cfe5286c42108d88e7"
+  revision = "df60624c1e9b9d2973e889c7a1cff73155da81c4"
 
 [[projects]]
   name = "google.golang.org/grpc"
@@ -291,12 +343,29 @@
   version = "v1.10.0"
 
 [[projects]]
+  name = "gopkg.in/src-d/go-billy.v4"
+  packages = [
+    ".",
+    "helper/chroot",
+    "helper/polyfill",
+    "osfs",
+    "util"
+  ]
+  revision = "027dceab1aa836eb310d92c2eb2266e4dc9f4b81"
+  version = "v4.1.0"
+
+[[projects]]
   name = "gopkg.in/src-d/go-git.v4"
   packages = [
     ".",
     "config",
+    "internal/revision",
     "plumbing",
+    "plumbing/cache",
+    "plumbing/filemode",
     "plumbing/format/config",
+    "plumbing/format/diff",
+    "plumbing/format/gitignore",
     "plumbing/format/idxfile",
     "plumbing/format/index",
     "plumbing/format/objfile",
@@ -306,6 +375,7 @@
     "plumbing/protocol/packp",
     "plumbing/protocol/packp/capability",
     "plumbing/protocol/packp/sideband",
+    "plumbing/revlist",
     "plumbing/storer",
     "plumbing/transport",
     "plumbing/transport/client",
@@ -313,24 +383,29 @@
     "plumbing/transport/git",
     "plumbing/transport/http",
     "plumbing/transport/internal/common",
+    "plumbing/transport/server",
     "plumbing/transport/ssh",
+    "storage",
     "storage/filesystem",
     "storage/filesystem/internal/dotgit",
     "storage/memory",
     "utils/binary",
     "utils/diff",
-    "utils/fs",
-    "utils/fs/os",
-    "utils/ioutil"
+    "utils/ioutil",
+    "utils/merkletrie",
+    "utils/merkletrie/filesystem",
+    "utils/merkletrie/index",
+    "utils/merkletrie/internal/frame",
+    "utils/merkletrie/noder"
   ]
-  revision = "c9353b2bd7c1cbdf8f78dad6deac64ed2f2ed9eb"
-  version = "v4.0.0-rc5"
+  revision = "1d28459504251497e0ce6132a0fadd5eb44ffd22"
+  version = "v4.2.0"
 
 [[projects]]
   name = "gopkg.in/warnings.v0"
   packages = ["."]
-  revision = "8a331561fe74dadba6edfc59f3be66c22c3b065d"
-  version = "v0.1.1"
+  revision = "ec4a0fea49c7b46c2aeb0b51aac55779c607e52b"
+  version = "v0.1.2"
 
 [solve-meta]
   analyzer-name = "dep"
