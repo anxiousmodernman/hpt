@@ -3,7 +3,8 @@
         "do_api_token": "{{ env `DIGITALOCEAN_API_TOKEN` }}",
         "hpt_config": "base.toml",
         "region": "sfo2",
-        "local_repo": "/home/tester/go/src/github.com/anxiousmodernman/hpt"
+        "local_repo": "/home/tester/go/src/github.com/anxiousmodernman/hpt",
+        "user_dir": "/home/tester/go/src/github.com/anxiousmodernman"
     },
     "builders": [
         {
@@ -20,41 +21,8 @@
         {
             "type": "shell",
             "execute_command": "echo {{user `ssh_username`}} | {{ .Vars }} sudo -E -S sh '{{ .Path }}'",
-            "inline": [
-                "mkdir -p /home/tester/go/bin",
-                "mkdir -p {{ user `local_repo` }}/vendor",
-                "yum install -y git wget unzip",
-                "cd {{ user `local_repo` }}",
-                "echo GIT IS $(which git)",
-                "git clone https://github.com/anxiousmodernman/hpt",
-                "echo whe are here $(pwd)",
-                "ls",
-                "echo inside!!!!",
-                "ls hpt",
-                "cd /tmp",
-                "wget --progress=dot:mega https://dl.google.com/go/go1.10.linux-amd64.tar.gz",
-                "tar -C /usr/local -xzf go1.10.linux-amd64.tar.gz",
-                "ln -s /usr/local/go/bin/go /usr/bin/go",
-                "export GOPATH=/home/tester/go",
-                "export PATH=$PATH:/home/tester/hpt/go/bin",
-                "cd /tmp",
-                "mkdir protobuf",
-                "wget --progress=dot:mega https://github.com/golang/dep/releases/download/v0.4.1/dep-linux-amd64",
-                "chmod +x dep-linux-amd64",
-                "ls",
-                "mv dep-linux-amd64 /home/tester/go/bin/dep",
-                "echo wtffffff",
-                "ls /home/tester/go/bin",
-                "wget -P --progress=dot:mega /tmp/protobuf https://github.com/google/protobuf/releases/download/v3.5.0/protoc-3.5.0-linux-x86_64.zip",
-                "cd protobuf",
-                "unzip protoc-3.5.0-linux-x86_64.zip",
-                "ls /tmp/protobuf/bin",
-                "sudo mv /tmp/protobuf/bin/protoc /bin",
-                "cd {{ user `local_repo` }}",
-                "ls",
-                "/home/tester/go/bin/dep ensure",
-                "./gen.sh",
-                "/usr/local/go/bin/go build"
+            "scripts": [
+                "install.sh"
             ]
         },
         {
