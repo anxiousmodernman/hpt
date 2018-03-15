@@ -23,7 +23,7 @@
                 "mkdir -p /home/tester/go/bin",
                 "mkdir -p /home/tester/go/src/github.com/anxiousmodernman/hpt/vendor",
                 "yum install -y git wget unzip",
-                "git clone https://github.com/anxiousmodernman/hpt /home/tester/go/src/github.com/anxiousmodernman/hpt",
+                "git clone https://github.com/anxiousmodernman/hpt /home/tester/go/src/github.com/anxiousmodernman",
                 "unzip packer_1.2.1_linux_amd64.zip",
                 "mv packer /usr/bin ",
                 "wget https://dl.google.com/go/go1.10.linux-amd64.tar.gz",
@@ -45,6 +45,7 @@
                 "ls /tmp/protobuf/bin",
                 "sudo mv /tmp/protobuf/bin/protoc /bin",
                 "cd /home/tester/go/src/github.com/anxiousmodernman/hpt",
+                "ls",
                 "/home/tester/go/bin/dep ensure",
                 "./gen.sh",
                 "/usr/local/go/bin/go build"
