@@ -1,10 +1,9 @@
-
 # Gopkg.toml example
 #
 # Refer to https://github.com/golang/dep/blob/master/docs/Gopkg.toml.md
 # for detailed Gopkg.toml documentation.
 #
-# required = ["github.com/user/thing/cmd/thing"]
+required = ["github.com/golang/protobuf/protoc-gen-go"]
 # ignored = ["github.com/anxiousmodernman/easyssh"]
 #
 # [[constraint]]
@@ -30,7 +29,6 @@
 [[constraint]]
   branch = "master"
   name = "github.com/anxiousmodernman/easyssh"
-
 
 [[constraint]]
   name = "github.com/digitalocean/godo"
