@@ -14,7 +14,7 @@
             "image": "{{ user `base_image` }}",
             "snapshot_name": "hpt-test-{{ timestamp }}",
             "region": "{{ user `region` }}",
-            "size": "4gb",
+            "size": "2gb",
             "ssh_username": "root",
             "api_token": "{{ user `do_api_token` }}"
         }
