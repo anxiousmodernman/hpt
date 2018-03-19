@@ -8,5 +8,5 @@ install:
     - sudo mv packer /usr/bin
 
 script:
-    - cd packer-test && GIT_BRANCH=$(git rev-parse --abrev-ref HEAD) packer build ci-fast.json
+    - cd packer-test && ./test.sh
 
