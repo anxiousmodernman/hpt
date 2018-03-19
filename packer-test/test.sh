@@ -1,11 +1,5 @@
 #!/bin/bash
 
-pushd ..
-go build
-popd
+export GIT_BRANCH=`git rev-parse --abbrev-ref HEAD` 
+packer build ci-fast.json
 
-cp ../hpt .
-
-packer build base.json
-
-rm -rf hpt
